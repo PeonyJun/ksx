@@ -3,1766 +3,921 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>控制台 - 温故流年</title>
+<link rel="shortcut icon" href="./logo/favicon.ico" type="image/x-icon">
+<link rel="icon" href="./logo/favicon.ico" type="image/x-icon">
+<title>阚双雪 - 邹洪 - 温故流年 - 自我感动</title>
+<meta name="description" content="这里是邹洪对阚双雪的专属回忆相册，记录一路走来的日常点滴，收藏两个人所有过往瞬间、心事与美好，把曾经的点点滴滴好好留存，定格属于彼此简单珍贵的回忆。">
+<meta property="og:title" content="阚双雪 - 邹洪 - 温故流年 - 自我感动">
+<meta property="og:description" content="这里是邹洪对阚双雪的专属回忆相册，记录一路走来的日常点滴，收藏两个人所有过往瞬间、心事与美好，把曾经的点点滴滴好好留存，定格属于彼此简单珍贵的回忆。">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="温故流年">
+<meta property="og:image" content="./img/阚双雪_66.jpg">
+<meta property="og:image:width" content="2160">
+<meta property="og:image:height" content="1440">
+<meta property="og:image:alt" content="回忆相册封面">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "headline": "阚双雪 - 邹洪 - 温故流年 - 自我感动",
+  "description": "这里是邹洪对阚双雪的专属回忆相册，记录一路走来的日常点滴，收藏两个人所有过往瞬间、心事与美好，把曾经的点点滴滴好好留存，定格属于彼此简单珍贵的回忆。",
+  "image": "./img/阚双雪_66.jpg",
+  "author": {
+    "@type": "Person",
+    "name": "邹洪"
+  },
+  "publisher": {
+    "@type": "Person",
+    "name": "邹洪"
+  },
+  "datePublished": "2025-11-01",
+  "dateModified": "2026-04-07"
+}
+</script>
 <style>
-:root { --bg: #050505; --card: #121212; --accent: #d4af37; --text: #e6e1d8; --dim: #858585; --danger: #ff4757; --safe: #2ed573; }
-* { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
-body { margin: 0; background: var(--bg); color: var(--text); font-family: sans-serif; overflow: hidden; height: 100vh; width: 100vw; }
-body > canvas:not(#cvs) { z-index: 9999 !important; pointer-events: none !important; position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw !important; height: 100vh !important; }
 
-.view { display: none; flex-direction: column; height: 100%; }
-.view.active { display: flex; }
-
-#v-login { align-items: center; justify-content: center; padding: 20px; }
-.login-box { width: 100%; max-width: 320px; text-align: center; background: var(--card); padding: 30px 20px; border-radius: 20px; border: 1px solid #1a1a1a; }
-.login-box svg { width: 50px; height: 50px; color: var(--accent); margin-bottom: 20px; }
-
-header { padding: 45px 20px 15px; display: flex; justify-content: space-between; align-items: flex-end; background: #000; border-bottom: 1px solid #1a1a1a; }
-header h1 { font-size: 20px; margin: 0; font-weight: 500; }
-.content { flex: 1; overflow-y: auto; padding: 15px 15px 100px; position: relative; }
-
-.panel { display: none; }
-.panel.active { display: block; }
-
-input, textarea { width: 100%; background: #0a0a0a; border: 1px solid #222; border-radius: 10px; padding: 14px; color: #fff; font-size: 14px; }
-button { width: 100%; padding: 15px; border-radius: 10px; border: none; background: var(--accent); color: #000; font-weight: bold; font-size: 15px; cursor: pointer; transition: 0.3s; }
-button:disabled { opacity: 0.5; pointer-events: none; }
-
-.fab { position: fixed; bottom: 85px; right: 20px; width: 56px; height: 56px; background: var(--accent); border-radius: 28px; display: flex; align-items: center; justify-content: center; color: #000; box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4); z-index: 100; transition: transform 0.2s; }
-.fab:active { transform: scale(0.9); }
-.fab svg { width: 22px; height: 22px; }
-
-.img-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-.img-item { aspect-ratio: 1; background: #111; border-radius: 8px; position: relative; overflow: hidden; border: 1px solid #222; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; transition: transform 0.2s, opacity 0.2s; }
-.img-item img { width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
-.img-mask { position: absolute; bottom: 0; left: 0; width: 100%; background: linear-gradient(transparent, rgba(0,0,0,0.9)); color: #fff; font-size: 11px; padding: 15px 5px 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; pointer-events: none; }
-.img-item.sel { border: 2px solid var(--safe); opacity: 0.7; }
-
-.audio-item { display: flex; align-items: center; position: relative; padding: 18px 15px; background: var(--card); border-radius: 12px; margin-bottom: 8px; border: 1px solid #1a1a1a; transition: all 0.3s; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
-.audio-item.playing { border-color: var(--accent); background: rgba(212,175,55,0.08); box-shadow: 0 0 10px rgba(212,175,55,0.1); }
-.audio-info { flex: 1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: 15px; pointer-events: none; }
-.play-icon { position: absolute; right: 15px; width: 18px; height: 18px; color: var(--accent); display: none; pointer-events: none; }
-.audio-item.playing .play-icon { display: block; }
-
-.pressing { transform: scale(0.93); opacity: 0.7; box-shadow: inset 0 0 20px rgba(0,0,0,0.5);  }
-.sort-mode .img-item, .sort-mode .audio-item { border: 1px dashed var(--accent); }
-
-.plg-item { display: flex; justify-content: space-between; align-items: center; padding: 18px; background: var(--card); border-radius: 12px; margin-bottom: 10px; }
-.plg-name { flex: 1; font-size: 15px; padding: 5px 0; color: var(--text); }
-.plg-previewing { color: var(--safe) !important; font-weight: bold; }
-
-.modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 1000; display: none; align-items: center; justify-content: center; padding: 25px; }
-.modal-content { background: var(--card); width: 100%; border-radius: 20px; padding: 20px; border: 1px solid #333; max-height: 80vh; overflow-y: auto; }
-.modal-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
-.btn-cancel { background: #222; color: #fff; }
-.btn-danger { background: #222; color: var(--danger); border: 1px solid var(--danger); }
-
-.switch { position: relative; display: inline-block; width: 44px; height: 24px; }
-.switch input { opacity: 0; width: 0; height: 0; }
-.slider { position: absolute; inset: 0; background-color: #333; transition: .3s; border-radius: 34px; }
-.slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; }
-input:checked + .slider { background-color: var(--accent); }
-input:checked + .slider:before { transform: translateX(20px); }
-
-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 65px; background: #000; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #1a1a1a; padding-bottom: env(safe-area-inset-bottom); z-index: 50; }
-.nav-btn { color: var(--dim); display: flex; flex-direction: column; align-items: center; font-size: 10px; cursor: pointer; width: 20%; }
-.nav-btn.active { color: var(--accent); }
-.nav-btn svg { width: 22px; height: 22px; margin-bottom: 4px; }
-
-.toast { position: fixed; top: 30px; left: 50%; transform: translateX(-50%); background: var(--accent); color: #000; padding: 12px 20px; border-radius: 30px; font-size: 13px; font-weight: bold; opacity: 0; transition: 0.3s; pointer-events: none; z-index: 2000; display: flex; align-items: center; gap: 8px; width: max-content; max-width: 80%; box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3); }
-.toast.show { opacity: 1; }
-.spinner { animation: spin 1s linear infinite; display: none; width: 16px; height: 16px; }
-.toast.loading .spinner { display: block; }
-@keyframes spin { 100% { transform: rotate(360deg); } }
-
-.refresh-bar { position: fixed; top: 10px; left: 50%; transform: translateX(-50%); background: var(--safe); color: #000; padding: 10px 20px; border-radius: 20px; font-size: 13px; font-weight: bold; z-index: 3000; display: none; align-items: center; box-shadow: 0 4px 15px rgba(46,213,115,0.4); }
-.refresh-bar button { margin: 0 0 0 10px; padding: 6px 12px; font-size: 12px; background: #000; color: #fff; border-radius: 10px; width: auto; border: none; }
-.refresh-bar.show { display: flex; }
-
-.bs-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1400; display: none; }
-.bs-overlay.show { display: block; }
-.bs-menu { position: fixed; bottom: 0; left: 0; width: 100%; background: var(--card); border-top-left-radius: 20px; border-top-right-radius: 20px; padding: 10px 20px; padding-bottom: calc(10px + env(safe-area-inset-bottom)); transform: translateY(100%); transition: transform 0.3s; z-index: 1500; box-shadow: 0 -5px 20px rgba(0,0,0,0.8); }
-.bs-menu.show { transform: translateY(0); }
-.bs-item { padding: 18px 0; border-bottom: 1px solid #1a1a1a; font-size: 15px; text-align: center; }
-.bs-item:last-child { border-bottom: none; color: var(--dim); border-top: 6px solid #000; }
-
-.up-item { display: flex; align-items: center; background: #111; padding: 10px; border-radius: 8px; margin-bottom: 10px; }
-.up-item input { margin: 0; border: none; background: transparent; padding: 5px; flex: 1; }
-
-/* 音频选中高亮反馈 */
-.audio-item.sel { 
-    border-color: var(--safe) !important; 
-    background: rgba(46,213,115,0.1) !important; 
-    box-shadow: 0 0 10px rgba(46,213,115,0.2) !important; 
+* {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
 }
 
-/* 底部悬浮药丸工具栏 (多选和排序共用) */
-#multi-bar, #sort-bar {
-    position: fixed;
-    bottom: 85px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: max-content;
-    max-width: 90%;
-    background: rgba(18, 18, 18, 0.95);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 30px;
-    display: none; 
+
+:root {
+    --bg-deep: #050505;
+    --text-primary: #e6e1d8;
+    --text-secondary: #858585;
+    --accent-gold: #d4af37;
+    --col-mobile-default: 4;
+    --col-mobile-toggle: 5;
+    --col-pc-default: 11;
+    --col-pc-toggle: 13;
+}
+
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+body {
+    margin: 0; width: 100vw; min-height: 100vh;
+    background-color: black; color: var(--text-primary);
+    font-family: 'Playfair Display', 'Noto Serif SC', serif;
+    padding-bottom: 120px; overflow-x: hidden;
+}
+
+
+.noise {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none; z-index: 500; opacity: 0.03;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+::-webkit-scrollbar { width: 0; }
+
+.header {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 35px 20px 25px; opacity: 0; animation: fadeUp 1.2s ease forwards;
+    position: relative;
+}
+.title {
+    font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 0.3em;
+    color: var(--accent-gold); opacity: 0.8; margin-bottom: 6px;
+    text-transform: uppercase; position: relative; overflow: visible;
+}
+.title::before {
+    content: ''; position: absolute; top: -14px; left: -12px;
+    width: 20px; height: 20px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath fill='%23D42E2E' d='M419.1 183.9c-12.8-63.5-56.9-88-60.6-90-50.6-28.1-133.5-25.1-140.7-24.8-5.3 0-10.4 1.3-15.1 3.7C191.9 78.4 126.9 119.3 84 195.9c-12.3 22-30.8 63-23.7 101.4 3.6 19.3 12 36.6 25 50.9l-5.6 4.2c-5.8 4.3-7 12.5-2.7 18.3l15 20c4.3 5.8 12.5 7 18.3 2.7l16-12c8.2 4.1 17.5 6.4 27.2 6.4h229.4c34.8 0 63.2-27.4 64.9-61.9.1-1.2.1-2.4.1-3.6 0-51.1-15.6-99.7-28.8-138.4z'/%3E%3Cpath fill='%23FFF' d='M396.6 348H122c-15.9 0-30-5.8-40.9-15.3-2.7-2.3-4.3-5.7-4.3-9.5 0-3.3 1.2-6.3 3.3-8.6 10.5-11.8 28.5-47.5 40.8-70.1 24.3 24.8 54.9 31.9 83.1 31.9 28 0 53.2-11.4 70.8-31.5 20.3 25.1 52.6 31.5 83.3 31.5 27.6 0 57.5-6.9 81.6-30.7 2.1 6.5 4.1 13 6 19.5 2.5 8.7 5 17.3 7 25.9 1.7 6.8 2.5 13.9 2.5 20.9 0 20.2-16.7 36-37.1 36h-21.5z'/%3E%3Ccircle cx='445.5' cy='78.5' r='45.5' fill='%23FFF'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-size: contain;
+    transform: rotate(-25deg); pointer-events: none; z-index: 10;
+    filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.5));
+}
+.subtitle {
+    font-size: 20px; font-weight: 400; letter-spacing: 0.1em;
+    color: rgba(255, 255, 255, 0.95); position: relative;
+}
+.subtitle::after {
+    content: ''; display: block; width: 20px; height: 1px;
+    background: var(--accent-gold); margin: 10px auto 0; opacity: 0.4;
+}
+
+#c {
+    display: grid;
+    grid-template-columns: repeat(var(--col-mobile-default), 1fr);
+    grid-auto-flow: row dense; 
+    gap: 8px; padding: 0 10px 100px;
+    max-width: 1920px; margin: 0 auto;
+    transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+}
+#c.dense { grid-template-columns: repeat(var(--col-mobile-toggle), 1fr); }
+
+@media (min-width: 768px) {
+    .header { padding: 50px 20px 40px; }
+    .subtitle { font-size: 24px; }
+    #c { 
+        grid-template-columns: repeat(var(--col-pc-default), 1fr); 
+        gap: 16px; padding: 0 40px 120px;
+    }
+    #c.dense { grid-template-columns: repeat(var(--col-pc-toggle), 1fr); }
+}
+
+.img-wrap {
+    aspect-ratio: 3/4;
+    position: relative;
+    border-radius: 3px;
+    overflow: hidden;
+    background: #0d0d0d;
+    display: flex;
     align-items: center;
     justify-content: center;
-    padding: 8px 15px;
-    z-index: 2000;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-    backdrop-filter: blur(10px);
-    gap: 10px;
+    contain: content;
+    will-change: transform;
+    
 }
 
-#multi-bar button, #sort-bar button {
-    margin: 0;
-    padding: 8px 18px;
-    width: auto;
-    font-size: 13px;
-    border-radius: 20px;
-    flex: none;
-    white-space: nowrap;
-    min-width: 60px;
+.img-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    opacity: 0;
+    position: absolute;
+    inset: 0;
+    transition: opacity 0.6s ease;
+    cursor: pointer; 
+    transition: transform 1.2s cubic-bezier(0.19, 1, 0.22, 1), filter 0.6s ease, opacity 0.6s ease;
+    filter: brightness(0.9) contrast(0.95) saturate(0.9);
+    backface-visibility: hidden;
+    z-index: 1;
+    transform: translateZ(0);
+}
+
+.img-wrap.loaded img {
+    opacity: 1;
+}
+
+.img-wrap.loaded:hover img {
+    transform: scale(1.04);
+    filter: brightness(1.05) contrast(1.05) saturate(1.05);
+}
+
+img:not([src]), img[src=""], img:-moz-broken {
+    opacity: 0 !important;
+    visibility: hidden;
+}
+
+.status-icon {
+    position: relative;
+    width: 16px;
+    height: 16px;
+    color: #606060;
+    z-index: 2;
+    transition: opacity 0.3s ease;
+}
+
+.img-wrap:not(.error) .status-icon {
+    animation: rotate 1.2s linear infinite;
+}
+
+.img-wrap.error .status-icon {
+    color: #606060;
+    animation: none;
+}
+
+.img-wrap.loaded .status-icon {
+    opacity: 0;
+    pointer-events: none;
+}
+
+@keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.img-wrap.hero {
+    grid-row: span 4;
+    aspect-ratio: auto !important;
+}
+
+.img {
+    width: 100%; height: 100%; object-fit: cover; display: block;
+    cursor: pointer; transition: transform 1.2s cubic-bezier(0.19, 1, 0.22, 1), filter 0.6s ease;
+    filter: brightness(0.9) contrast(0.95) saturate(0.9);
+}
+.img-wrap.hero img { filter: brightness(0.95) contrast(1.0) saturate(0.95); }
+
+
+
+.noise {
+    transform: translateZ(0);
+}
+
+#v {
+    position: fixed; inset: 0; background: rgba(0, 0, 0, 0.8);
+    display: none; align-items: center; justify-content: center;
+    z-index: 2000; cursor: zoom-out;
+}
+#v img {
+    width: auto; height: auto; max-width: 98vw; max-height: 70vh;
+    object-fit: contain; border-radius: 3px;
+    box-shadow: 0 20px 80px rgba(0,0,0,0.8);
+    animation: zoomIn 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    transition: none;
+    filter: none;
+}
+
+#lv {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: #000; z-index: 2100; display: none;
+    overflow-y: auto; -webkit-overflow-scrolling: touch;
+    animation: fadeIn 0.3s ease;
+}
+#lv img {
+    display: block; width: 100%; height: auto;
+    margin: 0; padding: 0;
+}
+
+@keyframes zoomIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.nav-container {
+    position: fixed; bottom: 0; left: 0; width: 100%; height: 100px;
+    display: flex; justify-content: center; align-items: flex-end;
+    z-index: 1000; background: linear-gradient(to top, rgba(5,5,5,1) 10%, transparent);
+    pointer-events: none; padding-bottom: 15px;
+}
+.nav {
+    pointer-events: auto; width: 100%; max-width: 380px; height: 50px;
+    background: rgba(25, 25, 28, 0.95);
+    border: 1px solid rgba(255,255,255,0.08); border-radius: 25px;
+    display: flex; align-items: center; justify-content: space-evenly;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05);
+    position: relative; overflow: hidden;
+    transition: transform 0.3s ease, background 0.3s;
+}
+.nav:hover { background: rgba(30, 30, 35, 0.8); transform: translateY(-2px); }
+#cvs {
+    position: absolute; bottom: 0; left: 0; width: 100%; height: 100%;
+    opacity: 0.6; pointer-events: none; mix-blend-mode: screen;
+}
+.btn {
+    background: none; border: none; color: #ccc;
+    padding: 0; width: 34px; height: 34px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; opacity: 0.7; transition: all 0.3s ease; z-index: 2;
+}
+.btn:hover { opacity: 1; color: #fff; transform: scale(1.1); text-shadow: 0 0 10px rgba(255,255,255,0.5); }
+.btn svg { width: 16px; height: 16px; }
+.btn-l svg { width: 18px; height: 18px; }
+#p {
+    width: 38px; height: 38px; border-radius: 50%;
+    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+    opacity: 1; color: #fff;
 }
 
 
+#ml {
+    position: fixed; bottom: 95px; left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    width: 280px; max-height: 45vh;
+    background: rgba(15, 15, 18, 0.98);
+    border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px;
+    display: none; flex-direction: column; padding: 5px;
+    overflow-y: auto; z-index: 900; opacity: 0;
+    transition: opacity 0.3s, transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.6), inset 0 0 20px rgba(255,255,255,0.02);
+}
+#ml.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.mi {
+    padding: 12px 16px; font-size: 13px; color: var(--text-secondary);
+    cursor: pointer; transition: all 0.25s; font-weight: 300;
+    border-radius: 6px; margin-bottom: 2px; display: flex; align-items: center;
+}
+.mi:hover { background: rgba(255,255,255,0.04); color: #fff; padding-left: 20px; }
+.mi.act { 
+    background: linear-gradient(90deg, rgba(212, 175, 55, 0.1), transparent);
+    color: #fff; font-weight: 500; text-shadow: 0 0 10px rgba(212, 175, 55, 0.4);
+}
+.mi.act::before {
+    content: ''; display: block; width: 4px; height: 4px;
+    background: var(--accent-gold); border-radius: 50%;
+    margin-right: 10px; box-shadow: 0 0 8px var(--accent-gold);
+}
+
+.t {font-size:14px; text-align:center;line-height:2.4; padding-bottom:40px;}
 
 
-.custom-select { position: relative; width: 100%; margin-top: 0; }
-.select-selected { background: #0a0a0a; border: 1px solid #222; border-radius: 10px; padding: 14px; color: #fff; font-size: 14px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
-.select-selected:after { content: "▼"; font-size: 12px; color: var(--dim); }
-.select-items { position: absolute; background: #111; border: 1px solid #333; border-radius: 10px; top: 100%; left: 0; right: 0; z-index: 99; display: none; max-height: 220px; overflow-y: auto; margin-top: 5px; box-shadow: 0 10px 20px rgba(0,0,0,0.8); }
-.select-items.show { display: block; }
-.select-items div { padding: 14px; cursor: pointer; border-bottom: 1px solid #222; font-size: 14px; }
-.select-items div:last-child { border-bottom: none; }
-.layout-inputs { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 8px; margin-top: 0; }
-.layout-inputs input { text-align: center; padding: 14px 5px; }
-
-.action-bar { display: none; width: 100%; text-align: right; margin-top: 8px; }
-.action-bar button { display: inline-block !important; width: auto !important; min-width: 70px !important; padding: 8px 16px !important; margin: 0 0 0 12px !important; font-size: 13px !important; border-radius: 8px !important; }
-.btn-cancel-inline { background: #2a2a2a !important; color: #e6e1d8 !important; border: 1px solid #444 !important; }
-.btn-save-inline { background: var(--safe) !important; color: #000 !important; box-shadow: 0 4px 10px rgba(46,213,115,0.3) !important; border: none !important; }
-
-
-.up-pos-box { display: none; align-items: center; justify-content: space-between; margin-top: 10px; padding: 12px; background: #0a0a0a; border-radius: 10px; border: 1px solid #1a1a1a; }
-.up-pos-box span { font-size: 13px; color: var(--dim); }
-.pos-btns { display: flex; background: #1a1a1a; border-radius: 8px; padding: 2px; }
-.pos-btn { padding: 5px 12px; font-size: 12px; border-radius: 6px; cursor: pointer; color: var(--dim); transition: 0.2s; }
-.pos-btn.active { background: var(--accent); color: #000; font-weight: bold; }
-
+body > canvas:not(#cvs) {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    pointer-events: none !important;
+    z-index: 1 !important;
+}
 </style>
+
+
 </head>
 <body>
 
-<div id="v-login" class="view active">
-    <div class="login-box">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-        <h2 style="margin: 0 0 20px; font-weight: 300;">温故流年系统</h2>
-        <input type="password" id="tk-in" placeholder="输入 GitHub 令牌" style="margin-top:0;">
-        <button id="btn-login" onclick="handleLogin()" style="margin-top:20px;">安全登录</button>
+
+<div class="noise"></div>
+<div class="header">
+    <div class="title">KSX ZH</div>
+    <div class="subtitle">温故流年</div>
+</div>
+<div id="c"></div>
+<div id="v"><img></div>
+<div class="t"></div>
+<div id="lv"><img id="li"></div>
+<div id="ml"></div>
+
+<div class="nav-container">
+    <div class="nav">
+        <canvas id="cvs"></canvas>
+        <button id="list" class="btn" aria-label="Menu">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="4" y1="12" x2="20" y2="12"></line><line x1="4" y1="6" x2="20" y2="6"></line><line x1="4" y1="18" x2="20" y2="18"></line></svg>
+        </button>
+        <button id="b" class="btn btn-l" aria-label="Prev">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 20L9 12l10-8v16z"></path><path d="M5 19V5"></path></svg>
+        </button>
+        <button id="p" class="btn" aria-label="Play">
+            <svg id="pi" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M5 3l14 9-14 9V3z"></path></svg>
+        </button>
+        <button id="n" class="btn btn-l" aria-label="Next">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4l10 8-10 8V4z"></path><path d="M19 5v14"></path></svg>
+        </button>
+        <button id="l" class="btn" aria-label="View">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+        </button>
     </div>
 </div>
 
-<div id="v-app" class="view">
-    <header>
-        <h1 id="h-title">图库</h1>
-        <svg onclick="fetchCloudData(false, true)" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--accent);cursor:pointer;"><path d="M23 4v6h-6"></path><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
-    </header>
-
-    <main class="content">
-        <div id="p-img" class="panel active">
-            <div class="img-grid" id="img-list"></div>
-        </div>
-
-        <div id="p-audio" class="panel">
-            <div id="audio-list"></div>
-        </div>
-        
-        <div id="p-plg" class="panel">
-            <div style="font-size:12px;color:var(--dim);margin-bottom:15px;">点击名称可预览特效，再次点击关闭。</div>
-            <div id="plg-list"></div>
-        </div>
-
-        <div id="p-disabled" class="panel">
-            <div style="font-size:12px;color:var(--dim);margin-bottom:10px;">图片素材</div>
-            <div class="img-grid" id="dis-img-list" style="margin-bottom:25px;"></div>
-            <div style="font-size:12px;color:var(--dim);margin-bottom:10px;">音频素材</div>
-            <div id="dis-audio-list"></div>
-            <div class="fab" onclick="openBsMenu('m-uptype')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></div>
-        </div>
-
-        <div id="p-manage" class="panel">
-    <div style="font-size:12px; color:var(--dim); margin-bottom:5px;">管理目标仓库</div>
-    <div class="custom-select">
-        <div class="select-selected" id="repo-selected" onclick="toggleSelect()">读取中...</div>
-        <div class="select-items" id="repo-options"></div>
-    </div>
-
-    <div style="font-size:12px; color:var(--dim); margin:15px 0 5px;">网站名称</div>
-    <input type="text" id="site-name" style="margin-top:0;" oninput="checkChange('site-name', 'act-name')">
-    <div class="action-bar" id="act-name">
-        <button class="btn-cancel-inline" onclick="cancelChange('site-name', 'act-name')">取消</button>
-        <button class="btn-save-inline" onclick="saveField('name')">保存</button>
-    </div>
-
-    <div style="font-size:12px; color:var(--dim); margin:15px 0 5px;">网站介绍</div>
-    <textarea id="site-intro" rows="5" style="margin-top:0; line-height:1.6; min-height:100px;" oninput="checkChange('site-intro', 'act-intro')"></textarea>
-    <div class="action-bar" id="act-intro">
-        <button class="btn-cancel-inline" onclick="cancelChange('site-intro', 'act-intro')">取消</button>
-        <button class="btn-save-inline" onclick="saveField('intro')">保存</button>
-    </div>
-
-    <div style="font-size:12px; color:var(--dim); margin:15px 0 5px;">字母</div>
-    <input type="text" id="site-ui-title" style="margin-top:0;" oninput="checkChange('site-ui-title', 'act-ui-title')">
-    <div class="action-bar" id="act-ui-title">
-        <button class="btn-cancel-inline" onclick="cancelChange('site-ui-title', 'act-ui-title')">取消</button>
-        <button class="btn-save-inline" onclick="saveField('ui-title')">保存</button>
-    </div>
-
-    <div style="font-size:12px; color:var(--dim); margin:15px 0 5px;">标题</div>
-    <input type="text" id="site-ui-sub" style="margin-top:0;" oninput="checkChange('site-ui-sub', 'act-ui-sub')">
-    <div class="action-bar" id="act-ui-sub">
-        <button class="btn-cancel-inline" onclick="cancelChange('site-ui-sub', 'act-ui-sub')">取消</button>
-        <button class="btn-save-inline" onclick="saveField('ui-sub')">保存</button>
-    </div>
-
-    <div style="font-size:12px; color:var(--dim); margin:15px 0 5px;">图片列数 (手机默认 / 手机切换 / PC默认 / PC切换)</div>
-    <div class="layout-inputs">
-        <input type="number" id="col-md" placeholder="手默" oninput="checkLayoutChange()">
-        <input type="number" id="col-mt" placeholder="手切" oninput="checkLayoutChange()">
-        <input type="number" id="col-pd" placeholder="P默" oninput="checkLayoutChange()">
-        <input type="number" id="col-pt" placeholder="P切" oninput="checkLayoutChange()">
-    </div>
-    <div class="action-bar" id="act-layout">
-        <button class="btn-cancel-inline" onclick="cancelLayoutChange()">取消</button>
-        <button class="btn-save-inline" onclick="saveField('layout')">保存</button>
-    </div>
-    
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:30px; padding:15px; background:var(--card); border-radius:10px;">
-        <div>
-            <div style="font-size:14px; margin-bottom:4px;">前端缓存</div>
-            <div style="font-size:11px; color:var(--dim);">启用网站缓存.js</div>
-        </div>
-        <label class="switch"><input type="checkbox" id="switch-cache" onchange="toggleCache(this)"><span class="slider"></span></label>
-    </div>
-    
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:15px; padding:15px; background:var(--card); border-radius:10px;">
-        <span style="font-size:14px;">记住密码</span>
-        <label class="switch"><input type="checkbox" id="switch-rem" onchange="toggleRem(this)"><span class="slider"></span></label>
-    </div>
-     
-    <button onclick="safeAction('同步库文件', '将根据文件夹 img mp3 js 内实际文件校准数据，清理不存在的记录并同步文件夹内资源', syncFoldersToIndex)" style="background:var(--safe); color:#000; margin-top:30px;">同步库文件</button>
-
-<button onclick="safeAction('退出', '确认退出？', logout)" style="background:transparent; color:var(--danger); border:1px solid var(--danger); margin-top:15px;">退出登录</button>
-
-
-
-</div>
-
-
-    </main>
-
-    <div class="multi-bar" id="multi-bar">
-        <button class="btn-cancel" onclick="cancelMulti()">取消</button>
-        <button onclick="safeAction('移至素材', '选中的文件将移出首页，确认操作？', doMultiDisable)" style="background:var(--accent);color:#000;">移至素材</button>
-    </div>
-    <div class="multi-bar" id="sort-bar">
-        <button class="btn-cancel" onclick="cancelSort()">取消</button>
-        <button onclick="commitSort()" style="background:var(--safe);color:#000;">保存排序</button>
-    </div>
-
-    <nav>
-        <div class="nav-btn active" onclick="tab('p-img', this, '图库')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg><span>图片</span></div>
-        <div class="nav-btn" onclick="tab('p-audio', this, '音频库')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg><span>音频</span></div>
-        <div class="nav-btn" onclick="tab('p-plg', this, '插件')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg><span>插件</span></div>
-        <div class="nav-btn" onclick="tab('p-disabled', this, '素材库')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg><span>素材</span></div>
-        <div class="nav-btn" onclick="tab('p-manage', this, '网站管理')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg><span>设置</span></div>
-    </nav>
-</div>
-
-<div id="bs-overlay" class="bs-overlay" onclick="clsBs()"></div>
-
-<div id="m-confirm" class="modal">
-    <div class="modal-content">
-        <h3 id="c-title" style="margin:0 0 15px; font-size:16px;">确认操作</h3>
-        <p id="c-desc" style="font-size:13px; color:var(--dim); line-height:1.5;"></p>
-        <div class="modal-btns">
-            <button class="btn-cancel" onclick="cls('m-confirm')">取消</button>
-            <button id="c-btn" style="background:var(--accent); color:#000;" onclick="execConfirm()">确定</button>
-        </div>
-    </div>
-</div>
-
-<div id="m-uptype" class="bs-menu">
-    <div class="bs-item" onclick="clsBs();openUpload('img')">上传图片</div>
-    <div class="bs-item" onclick="clsBs();openUpload('audio')">上传音频</div>
-    <div class="bs-item" onclick="clsBs()">取消</div>
-</div>
-
-<div id="bs-menu" class="bs-menu"></div>
-
-<div id="m-up" class="modal">
-    <div class="modal-content">
-        <h3 style="margin:0 0 15px; font-size:16px;">待上传文件</h3>
-        <div id="up-list" style="max-height:50vh; overflow-y:auto;"></div>
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:15px; padding:10px 0;">
-            <span style="font-size:14px; color:var(--dim);">发布到网站</span>
-            <label class="switch"><input type="checkbox" id="up-target" onchange="toggleUpPos(this.checked)"><span class="slider"></span></label>
-        </div>
-        <div id="up-pos-ctrl" class="up-pos-box">
-            <span>发布位置</span>
-            <div class="pos-btns">
-                <div id="pos-start" class="pos-btn active" onclick="setUpPos('start')">首部</div>
-                <div id="pos-end" class="pos-btn" onclick="setUpPos('end')">尾部</div>
-            </div>
-        </div>
-        <div class="modal-btns">
-            <button class="btn-cancel" onclick="document.getElementById('m-up').style.display='none'">取消</button>
-            <button onclick="commitUp()">上传</button>
-
-        </div>
-    </div>
-</div>
-
-
-<div id="m-rename" class="modal">
-    <div class="modal-content">
-        <h3 style="margin:0 0 15px; font-size:16px;">重命名文件</h3>
-        <div style="display:flex; gap:8px; align-items:center;">
-            <input type="text" id="rn-name" placeholder="名称" style="flex:3; margin:0; padding:10px;">
-            <input type="text" id="rn-ext" placeholder="后缀" style="flex:1; margin:0; padding:10px; color:var(--dim); text-align:center;">
-        </div>
-        <div class="modal-btns">
-            <button class="btn-cancel" onclick="document.getElementById('m-rename').style.display='none'">取消</button>
-            <button onclick="commitRename()">确认</button>
-        </div>
-    </div>
-</div>
-
-
-
-<div id="refresh-toast" class="refresh-bar">
-    <span>发现新内容</span>
-    <button onclick="location.reload()">点击刷新</button>
-</div>
-
-<div id="toast" class="toast">
-    <svg class="spinner" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path></svg>
-    <span id="toast-txt"></span>
-</div>
-
-
-<div id="m-multi-pub" class="modal">
-    <div class="modal-content">
-        <h3 style="margin:0 0 15px; font-size:16px;">发布到网站</h3>
-        <p style="font-size:13px; color:var(--dim); line-height:1.5;">请选择选中的文件在首页的显示位置：</p>
-        <div class="modal-btns">
-            <button style="background:#222; color:#fff;" onclick="doMultiEnable('end')">发布到尾部</button>
-            <button style="background:var(--safe); color:#000;" onclick="doMultiEnable('start')">发布到首部</button>
-        </div>
-        <button class="btn-cancel" style="margin-top:10px;width:100%;" onclick="cls('m-multi-pub')">取消</button>
-    </div>
-</div>
+<audio id="a" hidden preload="auto" playsinline x-webkit-airplay="allow"></audio>
 
 <script>
-var remFlag = localStorage.getItem('ksx_rem') !== 'false';
-var tk = remFlag ? (localStorage.getItem('gt') || sessionStorage.getItem('gt')) : sessionStorage.getItem('gt');
-var repo = localStorage.getItem('gr') || '';
+!function(){
+    const musicFiles = [
+        '尾季篇.mp3',
+        '失去后才明白.mp3',
+        '落日.mp3',
+        '温柔的徘徊.mp3',
+        '星辰大海.mp3',
+        '在你的身边.mp3'
+    ];
+    
+    const rawImageFiles = [
+        '迟来的深情.jpg',
+        '阚双雪_83.jpg',
+        '阚双雪_85.jpg',
+        '阚双雪_82.jpg',
+        '阚双雪_81.jpg',
+        '阚双雪_80.jpg',
+        '阚双雪_79.jpg',
+        '阚双雪_78.jpg',
+        '阚双雪_77.jpg',
+        '阚双雪_75.jpg',
+        '阚双雪_74.jpg',
+        '阚双雪_73.jpg',
+        '阚双雪_72.jpg',
+        '阚双雪_71.jpg',
+        '阚双雪_70.jpg',
+        '阚双雪_69.jpg',
+        '阚双雪_68.jpg',
+        '阚双雪_67.jpg',
+        '阚双雪_66.jpg',
+        '阚双雪_65.jpg',
+        '阚双雪_64.jpg',
+        '阚双雪_63.jpg',
+        '阚双雪_62.jpg',
+        '阚双雪_61.jpg',
+        '阚双雪_60.jpg',
+        '阚双雪_59.jpg',
+        '阚双雪_58.jpg',
+        '阚双雪_57.jpg',
+        '阚双雪_56.jpg',
+        '阚双雪_55.jpg',
+        '阚双雪_54.jpg',
+        '阚双雪_53.jpg',
+        '阚双雪_52.jpg',
+        '阚双雪_51.jpg',
+        '阚双雪_50.jpg',
+        '阚双雪_49.jpg',
+        '阚双雪_48.jpg',
+        '阚双雪_47.jpg',
+        '阚双雪_46.jpg',
+        '阚双雪_45.jpg',
+        '阚双雪_44.jpg',
+        '阚双雪_43.jpg',
+        '阚双雪_42.jpg',
+        '阚双雪_41.jpg',
+        '阚双雪_40.jpg',
+        '阚双雪_39.jpg',
+        '阚双雪_38.jpg',
+        '阚双雪_37.jpg',
+        '阚双雪_36.jpg',
+        '阚双雪_35.jpg',
+        '阚双雪_34.jpg',
+        '阚双雪_33.jpg',
+        '阚双雪_32.jpg',
+        '阚双雪_31.jpg',
+        '阚双雪_30.jpg',
+        '阚双雪_29.jpg',
+        '阚双雪_28.jpg',
+        '阚双雪_27.jpg',
+        '阚双雪_26.jpg',
+        '阚双雪_25.jpg',
+        '阚双雪_24.jpg',
+        '阚双雪_23.jpg',
+        '阚双雪_22.jpg',
+        '阚双雪_21.jpg',
+        '阚双雪_20.jpg',
+        '阚双雪_19.jpg',
+        '阚双雪_18.jpg',
+        '阚双雪_17.jpg',
+        '阚双雪_16.jpg',
+        '阚双雪_15.jpg',
+        '阚双雪_14.jpg',
+        '阚双雪_13.jpg',
+        '阚双雪_12.jpg',
+        '阚双雪_11.jpg',
+        '阚双雪_10.jpg',
+        '阚双雪_9.jpg',
+        '阚双雪_8.jpg',
+        '阚双雪_7.jpg',
+        '阚双雪_6.jpg',
+        '阚双雪_5.jpg',
+        '阚双雪_4.jpg',
+        '阚双雪_3.jpg',
+        '阚双雪_2.jpg',
+        '阚双雪_1.jpg'
+    ];
 
-var idxSha = '', idxHtml = '';
-var activeImgs = [], activeAudio = [];
-var allImgs = [], allAudio = [];
-var cloudHash = localStorage.getItem('ksx_cache_hash') || '';
-
-var curType, curName, curSha, curPath, curIsActive;
-var upQueue = [];
-var multiMode = false, selItems = [];
-var sortMode = false, sortDirty = false, curSortTab = '';
-var previewedPlgs = {};
-var globalConfirmAction = null;
-
-var audioObj = new Audio(), playPath = '';
-var dragSrcEl = null, dragGhost = null, dragListClass = '';
-var isDragging = false;
-var isLongPress = false, longT;
-var startX = 0, startY = 0;
-var pressingEl = null;
-
-var cacheRe = /()?/;
-
-document.addEventListener('click', function(e) {
-    var sel = document.getElementById('repo-options');
-    if(sel && !e.target.closest('.custom-select')) sel.classList.remove('show');
-});
-
-function msg(text, isLoading) { 
-    var t = document.getElementById('toast'); 
-    document.getElementById('toast-txt').innerText = text; 
-    if(isLoading) t.classList.add('loading'); else t.classList.remove('loading');
-    t.classList.add('show'); 
-    if(!isLoading) setTimeout(function(){ t.classList.remove('show'); }, 2500); 
-}
-function hideMsg() { document.getElementById('toast').classList.remove('show'); }
-function bD(s) { return decodeURIComponent(escape(atob(s))); }
-function bE(s) { return btoa(unescape(encodeURIComponent(s))); }
-
-function clsAll() {
-    clsBs();
-    document.querySelectorAll('.modal').forEach(function(el){ el.style.display='none'; });
-    cancelMulti();
-    cancelSort();
-}
-
-function safeAction(title, desc, actionFn) {
-    clsBs();
-    document.getElementById('c-title').innerText = title;
-    document.getElementById('c-desc').innerText = desc;
-    globalConfirmAction = actionFn;
-    document.getElementById('m-confirm').style.display = 'flex';
-}
-function execConfirm() {
-    document.getElementById('m-confirm').style.display = 'none';
-    if(globalConfirmAction) { globalConfirmAction(); globalConfirmAction = null; }
-}
-
-function bumpCacheVer() {
-    var encPath = encodeURIComponent('缓存.js');
-    api('/contents/' + encPath).then(function(r){
-        var c = bD(r.content);
-        var updated = false;
-        c = c.replace(/((?:CACHE_NAME|cacheName|VERSION|version)\s*=\s*['"][^'"]*?(?:v|V)?)(\d+)(['"])/g, function(m, p1, p2, p3) {
-            updated = true; return p1 + (parseInt(p2) + 1) + p3;
-        });
-        if(!updated) {
-            c = c.replace(/(['"][^'"]*?(?:v|V))(\d+)(['"])/, function(m, p1, p2, p3) {
-                updated = true; return p1 + (parseInt(p2) + 1) + p3;
-            });
-        }
-        if(updated) api('/contents/' + encPath, 'PUT', { message: 'Bump cache version', content: bE(c), sha: r.sha });
-    }).catch(function(){});
-}
-
-function api(p, m, b) {
-    var o = { method: m || 'GET', headers: { 'Authorization': 'token ' + tk, 'Accept': 'application/vnd.github.v3+json' } };
-    if(b) o.body = JSON.stringify(b);
-    var targetRepo = repo || 'rjdsq/ksx';
-    return fetch(p.indexOf('/user')===0 ? 'https://api.github.com' + p : 'https://api.github.com/repos/' + targetRepo + p, o).then(function(r) { 
-        if(!r.ok) throw r; 
-        return r.status !== 204 ? r.json() : null; 
-    });
-}
 
 
-function handleLogin() {
-    var v = document.getElementById('tk-in').value.trim();
-    if(!v) return msg('令牌不可为空');
-    tk = v;
-    document.getElementById('btn-login').innerText = '验证中...';
-    api('/user').then(function() {
-        if(remFlag) localStorage.setItem('gt', tk); else sessionStorage.setItem('gt', tk);
-        document.getElementById('v-login').classList.remove('active');
-        document.getElementById('v-app').classList.add('active');
-        loadData();
-    }).catch(function() { msg('验证失败，令牌错误'); tk=''; document.getElementById('btn-login').innerText = '安全登录'; });
-}
 
-function logout() { localStorage.removeItem('gt'); sessionStorage.removeItem('gt'); localStorage.removeItem('ksx_cached_data'); location.reload(); }
-function toggleRem(cb) { remFlag = cb.checked; localStorage.setItem('ksx_rem', remFlag); if(remFlag && tk) localStorage.setItem('gt', tk); else localStorage.removeItem('gt'); }
 
-function toggleSelect() { document.getElementById('repo-options').classList.toggle('show'); }
-function selectRepo(val, text) {
-    document.getElementById('repo-selected').innerText = text;
-    document.getElementById('repo-options').classList.remove('show');
-    if(repo !== val) {
-        repo = val; localStorage.setItem('gr', repo);
-        localStorage.removeItem('ksx_cached_data'); cloudHash = '';
-        loadData();
-    }
-}
+    const imageFiles = rawImageFiles;
 
-function fetchRepos() {
-    api('/user/repos?per_page=100&sort=updated').then(function(rs) {
-        var sel = document.getElementById('repo-options');
-        sel.innerHTML = '';
-        var found = false;
-        for(var i=0; i<rs.length; i++) {
-            var div = document.createElement('div');
-            div.innerText = rs[i].name;
-            div.setAttribute('data-val', rs[i].full_name);
-            div.onclick = function() { selectRepo(this.getAttribute('data-val'), this.innerText); };
-            if(rs[i].full_name === repo) { found = true; document.getElementById('repo-selected').innerText = rs[i].name; }
-            sel.appendChild(div);
-        }
-        if(!found && repo) {
-            var div2 = document.createElement('div');
-            var shortN = repo.split('/')[1] || repo;
-            div2.innerText = shortN; div2.setAttribute('data-val', repo);
-            div2.onclick = function() { selectRepo(this.getAttribute('data-val'), this.innerText); };
-            sel.insertBefore(div2, sel.firstChild);
-            document.getElementById('repo-selected').innerText = shortN;
-        }
-        if(!repo && rs.length > 0) {
-            repo = rs[0].full_name; localStorage.setItem('gr', repo);
-            document.getElementById('repo-selected').innerText = rs[0].name;
-        }
-    }).catch(function(){});
-}
+    
+    
 
-function loadData() {
-    document.getElementById('switch-rem').checked = remFlag;
-    fetchRepos();
-    var localData = localStorage.getItem('ksx_cached_data');
-    if (localData) {
+    let t=[],c=0,ia=!1,mp=!1;
+    const b=document.getElementById('b'),
+          q=document.getElementById('p'),
+          n=document.getElementById('n'),
+          u=document.getElementById('a'),
+          lb=document.getElementById('l'),
+          ct=document.getElementById('c'),
+          ls=document.getElementById('list'),
+          ml=document.getElementById('ml'),
+          cvs=document.getElementById('cvs'),
+          v=document.getElementById('v'),
+          lv=document.getElementById('lv'),
+          li=document.getElementById('li'),
+          pi=document.getElementById('pi');
+
+    let ac, an, src, ctx, gr;
+    let inited = false;
+
+    function initAudio() {
+        if(inited) return;
         try {
-            var d = JSON.parse(localData);
-            idxSha = d.idxSha; idxHtml = d.idxHtml;
-            allImgs = d.allImgs; allAudio = d.allAudio;
-            extractAndRender();
-        } catch(e){}
-    }
-    fetchCloudData(!!localData, false);
-    autoRestorePreviews();
-}
-
-
-function escapeReg(s) { 
-    return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); 
-}
-
-
-function openRename() {
-    clsBs();
-    var p = curName.split('.');
-    var ext = p.pop();
-    document.getElementById('rn-name').value = p.join('.');
-    document.getElementById('rn-ext').value = ext;
-    document.getElementById('m-rename').style.display='flex';
-}
-
-
-
-function commitRename() {
-    var nameVal = document.getElementById('rn-name').value.trim();
-    var extVal = document.getElementById('rn-ext').value.trim();
-    
-    if (extVal.indexOf('.') === 0) extVal = extVal.substring(1);
-    
-    var nN = nameVal + '.' + extVal;
-    if(nN === curName) return document.getElementById('m-rename').style.display='none';
-
-    document.getElementById('m-rename').style.display='none';
-    msg('读取中...', true);
-
-    var fld = curType === 'img' ? 'img' : 'mp3';
-    var targetF = findFile(curType === 'img' ? allImgs : allAudio, curName);
-    if(!targetF) return msg('文件丢失');
-
-    var encPath = curPath.split('/').map(encodeURIComponent).join('/');
-    var encNewPath = fld + '/' + encodeURIComponent(nN);
-
-    fetch(targetF.download_url).then(function(res) {
-        return res.blob();
-    }).then(function(blob) {
-        return new Promise(function(resolve, reject) {
-            var fr = new FileReader();
-            fr.onload = function(e) { resolve(e.target.result.split(',')[1]); };
-            fr.onerror = reject;
-            fr.readAsDataURL(blob);
-        });
-    }).then(function(b64) {
-        return api('/contents/' + encNewPath, 'PUT', { message: 'Rn ' + nN, content: b64 });
-    }).then(function() {
-        return api('/contents/' + encPath, 'DELETE', { message: 'Del ' + curName, sha: curSha });
-    }).then(function() {
-        var arr = curType === 'img' ? activeImgs : activeAudio;
-        var ix = arr.indexOf(curName);
-        if(ix !== -1) arr[ix] = nN;
-        return saveIdx(true);
-    }).then(function() {
-        msg('已重命名');
-        loadData();
-    }).catch(function() {
-        msg('重命名失败');
-        loadData();
-    });
-}
-
-
-
-
-function fetchCloudData(isSilent) {
-    if(!isSilent) msg('数据加载中...', true);
-    var cb = '?t=' + new Date().getTime();
-    api('/contents/index.html' + cb).then(function(r) {
-        var newHtml = bD(r.content);
-        cloudHash = r.sha;
-        localStorage.setItem('ksx_cache_hash', cloudHash);
-        idxSha = r.sha; idxHtml = newHtml;
-        return Promise.all([api('/contents/img' + cb).catch(function(){return [];}), api('/contents/mp3' + cb).catch(function(){return [];})]);
-    }).then(function(res) {
-        allImgs = res[0] || []; allAudio = res[1] || [];
-        var d = { idxSha: idxSha, idxHtml: idxHtml, allImgs: allImgs, allAudio: allAudio };
-        localStorage.setItem('ksx_cached_data', JSON.stringify(d));
-        extractAndRender();
-        if (!isSilent) msg('刷新成功');
-    }).catch(function() { if(!isSilent) msg('数据读取异常'); });
-}
-
-
-function doSeqUp(tAct) {
-    var c = 0, fld = curType === 'img' ? 'img' : 'mp3';
-    function upN() {
-        if(c >= upQueue.length) {
-            bumpCacheVer();
-            msg('资源已成功上传');
-            loadData();
-            return;
-        }
-        msg('上传执行 ' + (c + 1) + '/' + upQueue.length + '...', true);
-        var fn = upQueue[c].name + upQueue[c].ext;
-        api('/contents/' + fld + '/' + fn, 'PUT', { message: 'Up ' + fn, content: upQueue[c].b64 }).then(function() {
-            c++; upN();
-        }).catch(function() { 
-            c++; upN(); 
-        });
-    }
-    upN();
-}
-
-
-
-function commitDelRaw(p, s, n) {
-    msg('删除中...', true);
-    var encPath = p.split('/').map(encodeURIComponent).join('/');
-    
-    api('/contents/' + encPath, 'DELETE', {message:'Del '+n, sha:s}).then(function(){
-        bumpCacheVer();
-        msg('已彻底删除');
-        loadData();
-    }).catch(function(){ 
-        msg('删除失败'); 
-    });
-}
-
-
-
-function doMultiDelete() {
-    if(selItems.length === 0) return msg('请先选择');
-    msg('批量删除中...', true);
-    var c = 0;
-    function delNext() {
-        if(c >= selItems.length) {
-            bumpCacheVer();
-            msg('批量删除成功');
-            cancelMulti();
-            loadData();
-            return;
-        }
-        var fn = selItems[c];
-        var targetF = findFile(multiType === 'img' ? allImgs : allAudio, fn);
-        if(!targetF) { c++; delNext(); return; }
-        
-        var encPath = targetF.path.split('/').map(encodeURIComponent).join('/');
-        
-        api('/contents/' + encPath, 'DELETE', {message:'Bulk Del '+fn, sha:targetF.sha})
-        .then(function(){ c++; delNext(); })
-        .catch(function(){ c++; delNext(); });
-    }
-    delNext();
-}
-
-
-
-function syncFoldersToIndex() {
-    msg('正在校准库文件...', true);
-    var pI = api('/contents/img').catch(function(){return [];});
-    var pA = api('/contents/mp3').catch(function(){return [];});
-    var pJ = api('/contents/js').catch(function(){return [];});
-
-    Promise.all([pI, pA, pJ]).then(function(res) {
-        var realI = (res[0]||[]).map(function(f){return f.name;});
-        var realA = (res[1]||[]).map(function(f){return f.name;});
-        var realJ = (res[2]||[]).map(function(f){return f.name;});
-        
-        activeImgs = activeImgs.filter(function(n){ return realI.indexOf(n) !== -1; });
-        activeAudio = activeAudio.filter(function(n){ return realA.indexOf(n) !== -1; });
-        
-        var nH = idxHtml;
-        var tagRe = new RegExp('<scr'+'ipt[^>]*src\\s*=\\s*[\'"](?:\\.\\/|\\/)?js\\/([^\'"]+)[\'"][^>]*><\\/scr'+'ipt>\\s*', 'ig');
-        
-        nH = nH.replace(tagRe, function(match, p1) {
-            var dN = '';
-            try { dN = decodeURIComponent(p1); } catch(e) { dN = p1; }
-            if (realJ.indexOf(dN) === -1 && realJ.indexOf(p1) === -1) {
-                return '';
+            const AC = window.AudioContext || window.webkitAudioContext;
+            if(!AC) return;
+            ac = new AC();
+            an = ac.createAnalyser();
+            an.fftSize = 128;
+            an.smoothingTimeConstant = 0.85;
+            src = ac.createMediaElementSource(u);
+            src.connect(an);
+            an.connect(ac.destination);
+            ctx = cvs.getContext('2d', { alpha: true });
+            resize();
+            window.addEventListener('resize', resize);
+            inited = true;
+            if('mediaSession' in navigator){
+                navigator.mediaSession.setActionHandler('play', () => u.play());
+                navigator.mediaSession.setActionHandler('pause', () => u.pause());
+                navigator.mediaSession.setActionHandler('previoustrack', () => ld(c-1));
+                navigator.mediaSession.setActionHandler('nexttrack', () => ld(c+1));
             }
-            return match;
-        });
-        
-        idxHtml = nH;
-        return saveIdx(true);
-    }).then(function() {
-        msg('同步完成，已清理无效记录');
-        loadData();
-    }).catch(function() {
-        msg('同步失败');
-    });
-}
+            render();
+        } catch(e) { console.log(e); }
+    }
 
-function logout() { 
-    localStorage.removeItem('gt'); 
-    sessionStorage.removeItem('gt'); 
-    localStorage.removeItem('ksx_cached_data'); 
-    location.reload(); 
-}
-
-
-function openUpload(t) {
-    curType = t;
-    var i = document.createElement('input'); 
-    i.type = 'file'; 
-    i.multiple = true; 
-    i.accept = t === 'img' ? 'image/*' : 'audio/mpeg,.mp3';
-    i.onchange = function(e) {
-        if(e.target.files.length === 0) return;
-        upQueue = [];
-        for(var j=0; j<e.target.files.length; j++) {
-            var f = e.target.files[j];
+    function resize() {
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        cvs.width = cvs.offsetWidth * dpr;
+        cvs.height = cvs.offsetHeight * dpr;
+        if(ctx) {
+            ctx.scale(dpr, dpr);
+            gr = ctx.createLinearGradient(0, cvs.offsetHeight, 0, 0);
+            gr.addColorStop(0, 'rgba(255, 255, 255, 0.4)');
+            gr.addColorStop(0.4, 'rgba(212, 175, 55, 0.3)');
+            gr.addColorStop(1, 'rgba(212, 175, 55, 0)');
             
-            if (t === 'img' && f.type.indexOf('image/') !== 0) continue;
-            if (t !== 'img' && f.type.indexOf('audio/') !== 0 && f.name.indexOf('.mp3') === -1) continue;
+            ctx.shadowBlur = 4;
+            ctx.shadowColor = 'rgba(212, 175, 55, 0.4)';
+        }
+    }
+
+    function render() {
+        if(!inited) return;
+        requestAnimationFrame(render);
+        const w = cvs.offsetWidth;
+        const h = cvs.offsetHeight;
+        ctx.clearRect(0, 0, w, h);
+        if(u.paused) return;
+        
+        const len = an.frequencyBinCount;
+        const da = new Uint8Array(len);
+        an.getByteFrequencyData(da);
+        
+        const bars = 48;
+        const step = Math.floor(len * 0.8 / bars);
+        const gap = w / bars;
+        const bw = gap * 0.4;
+        
+        ctx.fillStyle = gr;
+        ctx.beginPath();
+        
+        for(let i = 0; i < bars; i++) {
+            let sum = 0;
+            for(let j = 0; j < step; j++) {
+                sum += da[i * step + j];
+            }
+            const avg = sum / step;
+            const val = (Math.pow(avg / 255, 1.5)) * h * 0.4;
             
-            var p = f.name.split('.'); var x = p.pop();
-            upQueue.push({ file: f, name: p.join('.'), ext: x, b64: '' });
+            const x = i * gap + gap/2 + 12;
+            const y = h - val;
+            
+            ctx.roundRect(x - bw/2, y, bw, val + 2, 4);
         }
-        
-        if(upQueue.length === 0) return msg('已过滤不匹配的文件格式');
-        
-        renderUpList();
-        document.getElementById('m-up').style.display = 'flex';
-        clsBs();
-    }; 
-    i.click();
-}
-
-
-
-
-
-function checkChange(id, barId) {
-    var el = document.getElementById(id);
-    var bar = document.getElementById(barId);
-    if (el.value !== window.initVals[id]) {
-        bar.style.display = 'block';
-    } else {
-        bar.style.display = 'none';
-    }
-}
-
-function cancelChange(id, barId) {
-    document.getElementById(id).value = window.initVals[id];
-    document.getElementById(barId).style.display = 'none';
-}
-
-function checkLayoutChange() {
-    var md = document.getElementById('col-md').value;
-    var mt = document.getElementById('col-mt').value;
-    var pd = document.getElementById('col-pd').value;
-    var pt = document.getElementById('col-pt').value;
-    var bar = document.getElementById('act-layout');
-    if (md !== window.initVals['col-md'] || mt !== window.initVals['col-mt'] || pd !== window.initVals['col-pd'] || pt !== window.initVals['col-pt']) {
-        bar.style.display = 'block';
-    } else {
-        bar.style.display = 'none';
-    }
-}
-
-function cancelLayoutChange() {
-    document.getElementById('col-md').value = window.initVals['col-md'];
-    document.getElementById('col-mt').value = window.initVals['col-mt'];
-    document.getElementById('col-pd').value = window.initVals['col-pd'];
-    document.getElementById('col-pt').value = window.initVals['col-pt'];
-    document.getElementById('act-layout').style.display = 'none';
-}
-
-
-
-
-
-
-var upPos = 'start';
-function toggleUpPos(val) {
-    document.getElementById('up-pos-ctrl').style.display = val ? 'flex' : 'none';
-}
-function setUpPos(p) {
-    upPos = p;
-    document.getElementById('pos-start').classList.toggle('active', p === 'start');
-    document.getElementById('pos-end').classList.toggle('active', p === 'end');
-}
-
-
-
-function saveField(type) {
-    var nH = idxHtml;
-    var msgTxt = '';
-
-    if (type === 'name') {
-        var nm = document.getElementById('site-name').value;
-        nH = nH.replace(/<title>([\s\S]*?)<\/title>/, '<title>'+nm+'</title>')
-               .replace(/<meta property="og:title" content="([\s\S]*?)">/, '<meta property="og:title" content="'+nm+'">')
-               .replace(/"headline":\s*"([^"]*)"/, '"headline": "'+nm+'"');
-        msgTxt = '网站名称';
-    } else if (type === 'intro') {
-        var i = document.getElementById('site-intro').value;
-        nH = nH.replace(/<meta name="description" content="([\s\S]*?)">/, '<meta name="description" content="'+i+'">')
-               .replace(/<meta property="og:description" content="([\s\S]*?)">/, '<meta property="og:description" content="'+i+'">')
-               .replace(/"description":\s*"([^"]*)"/, '"description": "'+i+'"');
-        msgTxt = '网站介绍';
-    } else if (type === 'ui-title') {
-        var uiT = document.getElementById('site-ui-title').value;
-        nH = nH.replace(/<div class="title">[\s\S]*?<\/div>/, '<div class="title">'+uiT+'</div>');
-        msgTxt = '小标题一';
-    } else if (type === 'ui-sub') {
-        var uiS = document.getElementById('site-ui-sub').value;
-        nH = nH.replace(/<div class="subtitle">[\s\S]*?<\/div>/, '<div class="subtitle">'+uiS+'</div>');
-        msgTxt = '小标题二';
-    } else if (type === 'layout') {
-        var md = document.getElementById('col-md').value || '4';
-        var mt = document.getElementById('col-mt').value || '5';
-        var pd = document.getElementById('col-pd').value || '11';
-        var pt = document.getElementById('col-pt').value || '13';
-        nH = nH.replace(/--col-mobile-default:\s*\d+;/, '--col-mobile-default: ' + md + ';')
-               .replace(/--col-mobile-toggle:\s*\d+;/, '--col-mobile-toggle: ' + mt + ';')
-               .replace(/--col-pc-default:\s*\d+;/, '--col-pc-default: ' + pd + ';')
-               .replace(/--col-pc-toggle:\s*\d+;/, '--col-pc-toggle: ' + pt + ';');
-        msgTxt = '布局参数';
+        ctx.fill();
     }
 
-    msg('保存中...', true);
-    api('/contents/index.html', 'PUT', { message: 'Update ' + msgTxt, content: bE(nH), sha: idxSha }).then(function(r){
-        idxSha = r.content.sha;
-        idxHtml = nH;
-        
-        if (type === 'name') window.initVals['site-name'] = document.getElementById('site-name').value;
-        if (type === 'intro') window.initVals['site-intro'] = document.getElementById('site-intro').value;
-        if (type === 'ui-title') window.initVals['site-ui-title'] = document.getElementById('site-ui-title').value;
-        if (type === 'ui-sub') window.initVals['site-ui-sub'] = document.getElementById('site-ui-sub').value;
-        if (type === 'layout') {
-            window.initVals['col-md'] = document.getElementById('col-md').value;
-            window.initVals['col-mt'] = document.getElementById('col-mt').value;
-            window.initVals['col-pd'] = document.getElementById('col-pd').value;
-            window.initVals['col-pt'] = document.getElementById('col-pt').value;
-        }
-
-        if (type === 'name') document.getElementById('act-name').style.display = 'none';
-        if (type === 'intro') document.getElementById('act-intro').style.display = 'none';
-        if (type === 'ui-title') document.getElementById('act-ui-title').style.display = 'none';
-        if (type === 'ui-sub') document.getElementById('act-ui-sub').style.display = 'none';
-        if (type === 'layout') document.getElementById('act-layout').style.display = 'none';
-
-        msg(msgTxt + '已保存');
-    });
-}
-
-
-
-
-
-
-
-
-
-function parseIdx() {
-    var rI = /(const rawImageFiles = \[)([\s\S]*?)(\];)/;
-    var rA = /(const musicFiles = \[)([\s\S]*?)(\];)/;
-    var mI = idxHtml.match(rI); var mA = idxHtml.match(rA);
-    activeImgs = mI ? mI[2].split(',').map(function(s){return s.trim().replace(/['"]/g,'');}).filter(Boolean) : [];
-    activeAudio = mA ? mA[2].split(',').map(function(s){return s.trim().replace(/['"]/g,'');}).filter(Boolean) : [];
-}
-
-function findFile(arr, n) {
-    for(var i=0; i<arr.length; i++) if(arr[i].name === n) return arr[i];
-    return null;
-}
-
-function renderMedia() {
-    var hI='', hA='', hDI='', hDA='';
-
-    for(var i=0; i<activeImgs.length; i++) {
-        var n = activeImgs[i];
-        var f = findFile(allImgs, n);
-        if(f) {
-            hI += '<div class="img-item '+(selItems.indexOf(f.name)!==-1?'sel':'')+'" id="i-'+f.sha+'" data-name="'+f.name+'" ontouchstart="ts(event, \''+f.name+'\', \''+f.path+'\', \''+f.sha+'\', \'img\', true)" ontouchmove="tm(event)" ontouchend="te(event)" onclick="iClk(\''+f.name+'\', this)">'+
-                  '<img src="'+f.download_url+'" loading="lazy"><div class="img-mask">'+f.name+'</div></div>';
-        }
+    function setIcon(p) {
+        pi.innerHTML = p 
+            ? '<rect x="7" y="6" width="3" height="12" rx="1.5"/><rect x="14" y="6" width="3" height="12" rx="1.5"/>' 
+            : '<path d="M5 3l14 9-14 9V3z"/>';
     }
+
+    lb.onclick=()=>{ct.classList.toggle('dense')};
     
-    for(var j=0; j<activeAudio.length; j++) {
-        var aName = activeAudio[j];
-        var af = findFile(allAudio, aName);
-        if(af) {
-            var isP = (playPath === af.download_url && !audioObj.paused);
-            hA += '<div class="audio-item '+(isP?'playing':'')+' '+(selItems.indexOf(af.name)!==-1?'sel':'')+'" id="i-'+af.sha+'" data-name="'+af.name+'" ontouchstart="ts(event, \''+af.name+'\', \''+af.path+'\', \''+af.sha+'\', \'audio\', true)" ontouchmove="tm(event)" ontouchend="te(event)" onclick="aClk(\''+af.name+'\', \''+af.download_url+'\', this)">'+
-                  '<div class="audio-info">'+af.name+'</div><svg class="play-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></div>';
+    ls.onclick=(e)=>{
+        e.stopPropagation();
+        if(ml.style.display === 'flex') {
+            ml.classList.remove('show');
+            setTimeout(()=>ml.style.display='none', 300);
+        } else {
+            ml.style.display = 'flex';
+            requestAnimationFrame(()=>ml.classList.add('show'));
+            const act = ml.querySelector('.act');
+            if(act) act.scrollIntoView({block:"center"});
         }
-    }
-
-    for(var k=0; k<allImgs.length; k++) {
-        var imgF = allImgs[k];
-        if(imgF.type === 'file' && activeImgs.indexOf(imgF.name) === -1) {
-            hDI += '<div class="img-item '+(selItems.indexOf(imgF.name)!==-1?'sel':'')+'" id="i-'+imgF.sha+'" data-name="'+imgF.name+'" ontouchstart="ts(event, \''+imgF.name+'\', \''+imgF.path+'\', \''+imgF.sha+'\', \'img\', false)" ontouchmove="tm(event)" ontouchend="te(event)" onclick="iClk(\''+imgF.name+'\', this)">'+
-                   '<img src="'+imgF.download_url+'" loading="lazy"><div class="img-mask">'+imgF.name+'</div></div>';
-        }
-    }
-    
-    for(var l=0; l<allAudio.length; l++) {
-        var audF = allAudio[l];
-        if(audF.type === 'file' && activeAudio.indexOf(audF.name) === -1) {
-            hDA += '<div class="audio-item '+(selItems.indexOf(audF.name)!==-1?'sel':'')+'" id="i-'+audF.sha+'" data-name="'+audF.name+'" ontouchstart="ts(event, \''+audF.name+'\', \''+audF.path+'\', \''+audF.sha+'\', \'audio\', false)" ontouchmove="tm(event)" ontouchend="te(event)" onclick="aClk(\''+audF.name+'\', \''+audF.download_url+'\', this)">'+
-                   '<div class="audio-info">'+audF.name+'</div></div>';
-        }
-    }
-
-    document.getElementById('img-list').innerHTML = hI;
-    document.getElementById('audio-list').innerHTML = hA;
-    document.getElementById('dis-img-list').innerHTML = hDI;
-    document.getElementById('dis-audio-list').innerHTML = hDA;
-}
-
-
-function extractAndRender() {
-    var tM = idxHtml.match(/<title>([\s\S]*?)<\/title>/);
-    var dM = idxHtml.match(/<meta name="description" content="([\s\S]*?)">/);
-    var uiTitleM = idxHtml.match(/<div class="title">([\s\S]*?)<\/div>/);
-    var uiSubM = idxHtml.match(/<div class="subtitle">([\s\S]*?)<\/div>/);
-    var mdM = idxHtml.match(/--col-mobile-default:\s*(\d+);/);
-    var mtM = idxHtml.match(/--col-mobile-toggle:\s*(\d+);/);
-    var pdM = idxHtml.match(/--col-pc-default:\s*(\d+);/);
-    var ptM = idxHtml.match(/--col-pc-toggle:\s*(\d+);/);
-    
-    var vName = tM ? tM[1] : '';
-    var vIntro = dM ? dM[1] : '';
-    var vUiTitle = uiTitleM ? uiTitleM[1] : '';
-    var vUiSub = uiSubM ? uiSubM[1] : '';
-    var vMd = mdM ? mdM[1] : '';
-    var vMt = mtM ? mtM[1] : '';
-    var vPd = pdM ? pdM[1] : '';
-    var vPt = ptM ? ptM[1] : '';
-
-    document.getElementById('site-name').value = vName;
-    document.getElementById('site-intro').value = vIntro;
-    document.getElementById('site-ui-title').value = vUiTitle;
-    document.getElementById('site-ui-sub').value = vUiSub;
-    document.getElementById('col-md').value = vMd;
-    document.getElementById('col-mt').value = vMt;
-    document.getElementById('col-pd').value = vPd;
-    document.getElementById('col-pt').value = vPt;
-
-    window.initVals = {
-        'site-name': vName,
-        'site-intro': vIntro,
-        'site-ui-title': vUiTitle,
-        'site-ui-sub': vUiSub,
-        'col-md': vMd,
-        'col-mt': vMt,
-        'col-pd': vPd,
-        'col-pt': vPt
     };
 
-    var bars = document.querySelectorAll('.action-bar');
-    for(var i=0; i<bars.length; i++) bars[i].style.display = 'none';
-
-    var swCache = document.getElementById('switch-cache');
-    if (swCache) {
-        var isCacheOn = idxHtml.indexOf('navigator.serviceWorker.register') !== -1;
-        swCache.checked = isCacheOn;
-    }
-    
-    parseIdx();
-    renderPlg();
-    renderMedia();
-}
-
-
-
-function renderPlg() {
-    api('/contents/js').then(function(fs) {
-        var h = '';
-        for(var i=0; i<fs.length; i++) {
-            var f = fs[i];
-            if(f.name.indexOf('.js')===f.name.length-3) {
-                var safeN = f.name.replace(/\./g, '\\\\.');
-                var encN = encodeURIComponent(f.name).replace(/\./g, '\\\\.');
-                var tagRe = new RegExp('<scr'+'ipt[^>]*src\\s*=\\s*[\'"](?:\\.\\/|\\/)?js\\/(?:'+safeN+'|'+encN+')[\'"][^>]*>', 'i');
-                var act = tagRe.test(idxHtml);
-                var pName = f.name.replace('.js', '');
-                var isPrev = previewedPlgs[f.name];
-                
-                h += '<div class="plg-item"><div class="plg-name '+(isPrev?'plg-previewing':'')+'" onclick="previewPlg(\''+f.name+'\')">'+pName+(isPrev?' (预览中)':'')+'</div><label class="switch"><input type="checkbox" '+(act?'checked':'')+' onclick="event.preventDefault(); safeAction(\'状态控制\',\'确认执行该操作吗？\', function(){togPlg(\''+f.name+'\', '+(act?'false':'true')+')})"><span class="slider"></span></label></div>';
-            }
+    window.addEventListener('click', (e) => {
+        if(ml.style.display === 'flex' && !e.target.closest('#list') && !e.target.closest('#ml')) {
+            ml.classList.remove('show');
+            setTimeout(()=>ml.style.display='none', 300);
         }
-        document.getElementById('plg-list').innerHTML = h;
-    }).catch(function(){});
-}
-
-
-
-
-
-
-function toggleCache(cb) {
-    var act = cb.checked;
-    cb.checked = !act; 
-    
-    safeAction('缓存控制', '确认更改前台文件运行策略？', function(){
-        var nH = idxHtml;
-        var swRegStr = "<scr"+"ipt>\n//离线缓存执行脚本 执行：缓存.js\nif ('serviceWorker' in navigator) {\n    window.addEventListener('load', () => {\n        navigator.serviceWorker.register('/缓存.js').catch(() => {});\n    });\n}\n</scr"+"ipt>";
-        var swUnregStr = "<scr"+"ipt>\n//注销缓存执行脚本\nif ('serviceWorker' in navigator) {\n    navigator.serviceWorker.getRegistrations().then(function(rs) {\n        for(var i=0; i<rs.length; i++) rs[i].unregister();\n    });\n}\n</scr"+"ipt>";
-
-        var regRe = new RegExp('<scr'+'ipt>(?:(?!<scr'+'ipt>)[\\s\\S])*?//离线缓存执行脚本(?:(?!<scr'+'ipt>)[\\s\\S])*?</scr'+'ipt>\\n?', 'g');
-        var unregRe = new RegExp('<scr'+'ipt>(?:(?!<scr'+'ipt>)[\\s\\S])*?//注销缓存执行脚本(?:(?!<scr'+'ipt>)[\\s\\S])*?</scr'+'ipt>\\n?', 'g');
-        var rawRe = new RegExp('<scr'+'ipt>(?:(?!<scr'+'ipt>)[\\s\\S])*?navigator\\.serviceWorker\\.register\\(\\s*[\'"]/缓存\\.js[\'"]\\s*\\)(?:(?!<scr'+'ipt>)[\\s\\S])*?</scr'+'ipt>\\n?', 'g');
-
-        nH = nH.replace(regRe, '').replace(unregRe, '').replace(rawRe, '');
-        var injectStr = (act ? swRegStr : swUnregStr) + "\n";
-        nH = nH.replace(/<\/body>/i, injectStr + '</body>');
-
-        msg('处理中...', true);
-        api('/contents/index.html', 'PUT', {message: 'Toggle Cache SW', content: bE(nH), sha: idxSha}).then(function(r){ 
-            idxSha = r.content.sha; 
-            idxHtml = nH; 
-            cb.checked = act; 
-            msg('状态已更改'); 
-        }).catch(function(){
-            msg('操作失败');
-        });
     });
-}
 
-
-
-
-function renderPlg() {
-    api('/contents/js').then(function(fs) {
-        var h = '';
-        for(var i=0; i<fs.length; i++) {
-            var f = fs[i];
-            if(f.name.indexOf('.js')===f.name.length-3) {
-                var safeN = escapeReg(f.name);
-                var encN = escapeReg(encodeURIComponent(f.name));
-                var tagRe = new RegExp('<scr'+'ipt[^>]*src\\s*=\\s*[\'"](?:\\.\\/|\\/)?js\\/(?:'+safeN+'|'+encN+')[\'"][^>]*><\\/scr'+'ipt>\\s*', 'i');
-                var act = tagRe.test(idxHtml);
-                var pName = f.name.replace('.js', '');
-                var isPrev = previewedPlgs[f.name];
-                
-                h += '<div class="plg-item"><div class="plg-name '+(isPrev?'plg-previewing':'')+'" onclick="previewPlg(\''+f.name+'\', \''+f.download_url+'\')">'+pName+(isPrev?' (预览中)':'')+'</div><label class="switch"><input type="checkbox" '+(act?'checked':'')+' onclick="event.preventDefault(); safeAction(\'状态控制\',\'确认执行该操作吗？\', function(){togPlg(\''+f.name+'\', '+(act?'false':'true')+')})"><span class="slider"></span></label></div>';
-            }
-        }
-        document.getElementById('plg-list').innerHTML = h;
-    }).catch(function(){});
-}
-
-
-function previewPlg(n, url) {
-    if (previewedPlgs[n]) {
-        var s = document.getElementById('prev-' + n);
-        if (s) s.parentNode.removeChild(s);
-        
-        delete previewedPlgs[n];
-        
-        if (Object.keys(previewedPlgs).length === 0) {
-            localStorage.removeItem('ksx_plg_previews');
-        } else {
-            localStorage.setItem('ksx_plg_previews', JSON.stringify(previewedPlgs));
-        }
-
-        var cvs = document.querySelectorAll('body > canvas:not(#cvs)');
-        for(var i=0; i<cvs.length; i++) cvs[i].parentNode.removeChild(cvs[i]);
-
-        for (var key in previewedPlgs) {
-            if (previewedPlgs[key]) {
-                var oldS = document.getElementById('prev-' + key);
-                if (oldS) oldS.parentNode.removeChild(oldS);
-                
-                (function(name, u) {
-                    fetch(u).then(function(res){ return res.text(); }).then(function(code){
-                        var ns = document.createElement('script');
-                        ns.id = 'prev-' + name;
-                        ns.textContent = "try { (function() {\n" + code + "\n})(); } catch(e) { console.error(e); }";
-                        document.body.appendChild(ns);
-                        window.dispatchEvent(new Event('load'));
-                    }).catch(function(){});
-                })(key, previewedPlgs[key]);
-            }
-        }
-
-        msg('已关闭预览');
-        renderPlg();
-    } else {
-        msg('获取云端插件中...', true);
-        var targetUrl = url || ('../js/' + n);
-        fetch(targetUrl).then(function(res) { 
-            return res.text(); 
-        }).then(function(code) {
-            var ns = document.createElement('script');
-            ns.id = 'prev-' + n;
-            ns.textContent = "try { (function() {\n" + code + "\n})(); } catch(e) { console.error(e); }";
-            document.body.appendChild(ns);
-            window.dispatchEvent(new Event('load'));
-            
-            previewedPlgs[n] = targetUrl;
-            localStorage.setItem('ksx_plg_previews', JSON.stringify(previewedPlgs));
-            
-            msg('已注入执行');
-            renderPlg();
-        }).catch(function() {
-            msg('插件获取失败');
+    const upd=()=>{
+        Array.from(ml.children).forEach((el,i)=>{
+            el.className = i===c ? 'mi act' : 'mi';
         });
-    }
-}
+        if(t[c] && 'mediaSession' in navigator){
+            navigator.mediaSession.metadata = new MediaMetadata({
+                title: t[c].n, artist: 'KSX ZH',
+                artwork: [{ 
+  src: './logo/favicon.ico', 
+  sizes: '192x192', 
+  type: 'image/x-icon' 
+}]
 
-
-function autoRestorePreviews() {
-    if (window.previewsRestored) return;
-    window.previewsRestored = true;
-    
-    var saved = localStorage.getItem('ksx_plg_previews');
-    if (saved) {
-        previewedPlgs = JSON.parse(saved);
-        for (var n in previewedPlgs) {
-            var targetUrl = previewedPlgs[n];
-            if (targetUrl) {
-                (function(name, u) {
-                    fetch(u).then(function(res){ return res.text(); }).then(function(code){
-                        var ns = document.createElement('script');
-                        ns.id = 'prev-' + name;
-                        ns.textContent = "try { (function() {\n" + code + "\n})(); } catch(e) { console.error(e); }";
-                        document.body.appendChild(ns);
-                        window.dispatchEvent(new Event('load'));
-                    }).catch(function(){});
-                })(n, targetUrl);
-            }
-        }
-    }
-}
-
-
-function togPlg(n, e) {
-    var nH = idxHtml;
-    var safeN = escapeReg(n);
-    var encN = escapeReg(encodeURIComponent(n));
-    var tagRe = new RegExp('<scr'+'ipt[^>]*src\\s*=\\s*[\'"](?:\\.\\/|\\/)?js\\/(?:'+safeN+'|'+encN+')[\'"][^>]*><\\/scr'+'ipt>\\s*', 'ig');
-    
-    var isTurnOn = String(e) === 'true';
-    
-    if(isTurnOn) {
-        if(!tagRe.test(nH)) {
-            var st = '<scr'+'ipt src="./js/'+n+'"></scr'+'ipt>\n';
-            nH = nH.replace(/<\/body>/i, st + '</body>');
-        }
-    } else {
-        nH = nH.replace(tagRe, '');
-    }
-    
-    msg('处理中...', true);
-    api('/contents/index.html', 'PUT', { message: 'Toggle '+n, content: bE(nH), sha: idxSha }).then(function(r) { 
-        idxSha=r.content.sha; 
-        idxHtml=nH; 
-        bumpCacheVer();
-        msg('配置已保存'); 
-        renderPlg(); 
-    }).catch(function() {
-        msg('操作失败'); 
-    });
-}
-
-
-
-
-
-
-
-function saveField(type) {
-    var nH = idxHtml;
-    var msgTxt = '';
-
-    if (type === 'name') {
-        var nm = document.getElementById('site-name').value;
-        nH = nH.replace(/<title>([\s\S]*?)<\/title>/, '<title>'+nm+'</title>')
-               .replace(/<meta property="og:title" content="([\s\S]*?)">/, '<meta property="og:title" content="'+nm+'">')
-               .replace(/"headline":\s*"([^"]*)"/, '"headline": "'+nm+'"');
-        msgTxt = '网站名称';
-    } else if (type === 'intro') {
-        var i = document.getElementById('site-intro').value;
-        nH = nH.replace(/<meta name="description" content="([\s\S]*?)">/, '<meta name="description" content="'+i+'">')
-               .replace(/<meta property="og:description" content="([\s\S]*?)">/, '<meta property="og:description" content="'+i+'">')
-               .replace(/"description":\s*"([^"]*)"/, '"description": "'+i+'"');
-        msgTxt = '网站介绍';
-    } else if (type === 'ui-title') {
-        var uiT = document.getElementById('site-ui-title').value;
-        nH = nH.replace(/<div class="title">[\s\S]*?<\/div>/, '<div class="title">'+uiT+'</div>');
-        msgTxt = '小标题一';
-    } else if (type === 'ui-sub') {
-        var uiS = document.getElementById('site-ui-sub').value;
-        nH = nH.replace(/<div class="subtitle">[\s\S]*?<\/div>/, '<div class="subtitle">'+uiS+'</div>');
-        msgTxt = '小标题二';
-    } else if (type === 'layout') {
-        var md = document.getElementById('col-md').value || '4';
-        var mt = document.getElementById('col-mt').value || '5';
-        var pd = document.getElementById('col-pd').value || '11';
-        var pt = document.getElementById('col-pt').value || '13';
-        nH = nH.replace(/--col-mobile-default:\s*\d+;/, '--col-mobile-default: ' + md + ';')
-               .replace(/--col-mobile-toggle:\s*\d+;/, '--col-mobile-toggle: ' + mt + ';')
-               .replace(/--col-pc-default:\s*\d+;/, '--col-pc-default: ' + pd + ';')
-               .replace(/--col-pc-toggle:\s*\d+;/, '--col-pc-toggle: ' + pt + ';');
-        msgTxt = '布局参数';
-    }
-
-    msg('保存中...', true);
-    api('/contents/index.html', 'PUT', { message: 'Update ' + msgTxt, content: bE(nH), sha: idxSha }).then(function(r){
-        idxSha = r.content.sha;
-        idxHtml = nH;
-        
-        if (type === 'name') window.initVals['site-name'] = document.getElementById('site-name').value;
-        if (type === 'intro') window.initVals['site-intro'] = document.getElementById('site-intro').value;
-        if (type === 'ui-title') window.initVals['site-ui-title'] = document.getElementById('site-ui-title').value;
-        if (type === 'ui-sub') window.initVals['site-ui-sub'] = document.getElementById('site-ui-sub').value;
-        if (type === 'layout') {
-            window.initVals['col-md'] = document.getElementById('col-md').value;
-            window.initVals['col-mt'] = document.getElementById('col-mt').value;
-            window.initVals['col-pd'] = document.getElementById('col-pd').value;
-            window.initVals['col-pt'] = document.getElementById('col-pt').value;
-        }
-
-        if (type === 'name') document.getElementById('btn-save-name').style.display = 'none';
-        if (type === 'intro') document.getElementById('btn-save-intro').style.display = 'none';
-        if (type === 'ui-title') document.getElementById('btn-save-ui-title').style.display = 'none';
-        if (type === 'ui-sub') document.getElementById('btn-save-ui-sub').style.display = 'none';
-        if (type === 'layout') document.getElementById('btn-save-layout').style.display = 'none';
-
-        msg(msgTxt + '已保存');
-    });
-}
-
-function bumpCacheVersion() {
-    msg('正在刷新前台缓存...', true);
-    api('/contents/缓存.js?t=' + new Date().getTime()).then(function(r) {
-        var content = bD(r.content);
-        var sha = r.sha;
-        
-        var newContent = content.replace(/(CACHE_NAME\s*=\s*['"][^0-9]*)(\d+)([^0-9]*['"])/, function(match, p1, p2, p3) {
-            return p1 + (parseInt(p2) + 1) + p3;
-        });
-        
-        if (content !== newContent) {
-            api('/contents/缓存.js', 'PUT', { message: 'Bump cache version', content: bE(newContent), sha: sha }).then(function() {
-                msg('前台缓存已强制刷新');
-            }).catch(function() {
-                msg('缓存刷新失败');
             });
-        } else {
-            msg('保存成功');
+            navigator.mediaSession.playbackState = "playing";
         }
-    }).catch(function() {
-        msg('保存成功');
-    });
-}
+    };
 
+    u.onplay = () => {
+        setIcon(true);
+        ia = true;
+        if(!inited) initAudio();
+        if(ac && ac.state === 'suspended') ac.resume();
+        upd();
+    };
 
-function setCur(t,n,p,s) { curType=t; curName=n; curPath=p; curSha=s; }
+    u.onpause = () => { setIcon(false); };
 
-
-
-function initDrag(el, type, touch) {
-    dragSrcEl = el;
-    dragListClass = type === 'img' ? 'img-item' : 'audio-item';
-    var rect = dragSrcEl.getBoundingClientRect();
-    dragGhost = dragSrcEl.cloneNode(true);
-    dragGhost.style.position = 'fixed';
-    dragGhost.style.top = rect.top + 'px';
-    dragGhost.style.left = rect.left + 'px';
-    dragGhost.style.width = rect.width + 'px';
-    dragGhost.style.height = rect.height + 'px';
-    dragGhost.style.opacity = '0.85';
-    dragGhost.style.zIndex = '9999';
-    dragGhost.style.pointerEvents = 'none';
-    dragGhost.style.transform = 'scale(1.05)';
-    dragGhost.style.boxShadow = '0 10px 20px rgba(212,175,55,0.4)';
-    dragGhost.style.border = '1px solid var(--accent)';
-    document.body.appendChild(dragGhost);
+    const pp=()=>{
+        if(!t.length)return;
+        if(!inited) initAudio();
+        if(u.paused){ mp=!1; u.play(); } else { mp=!0; u.pause(); }
+    };
     
-    dragSrcEl.style.opacity = '0.2';
-    isDragging = true;
-    if(window.navigator && window.navigator.vibrate) window.navigator.vibrate(30);
-}
+    let swp = false;
+    const ld = (i) => {
+        if(!t.length) return;
+        swp = true;
+        c = (i + t.length) % t.length;
+        u.src = t[c].u;
+        u.load();
+        mp = false;
+        let p = u.play();
+        if(p !== undefined) p.catch(()=>{});
+        setTimeout(() => { swp = false; }, 1000);
+    };
 
-function ts(e, n, p, s, t, isActive) {
-    isLongPress = false;
-    window.touchScrolling = false;
-    setCur(t, n, p, s);
-    curIsActive = isActive;
-    startX = e.touches[0].clientX;
-    startY = e.touches[0].clientY;
-    
-    if(multiMode) return; 
-    
-    if(sortMode && t === curSortTab) {
-        e.stopPropagation();
-        e.preventDefault(); 
-        initDrag(e.currentTarget, t, e.touches[0]);
-        return;
-    }
-    
-    pressingEl = e.currentTarget;
-    pressingEl.classList.add('pressing');
-    
-    longT = setTimeout(function(){
-        isLongPress = true;
-        if(pressingEl) pressingEl.classList.remove('pressing');
-        openBs();
-    }, 500);
-}
+    u.onended = () => { 
+        if(!swp) ld(c+1); 
+    };
 
-function tm(e) {
-    var touch = e.touches[0];
-    if(Math.abs(touch.clientX - startX) > 10 || Math.abs(touch.clientY - startY) > 10) {
-        window.touchScrolling = true;
-        if(!isDragging) {
-            clearTimeout(longT);
-            if(pressingEl) pressingEl.classList.remove('pressing');
+    u.ontimeupdate = () => {
+        if(u.duration > 0 && u.duration - u.currentTime <= 0.4 && !swp) {
+            ld(c+1);
         }
-    }
-    
-    if(multiMode) return;
-    
-    if(sortMode && isDragging && dragGhost) {
-        e.preventDefault(); 
-        dragGhost.style.left = (touch.clientX - dragGhost.offsetWidth/2) + 'px';
-        dragGhost.style.top = (touch.clientY - dragGhost.offsetHeight/2) + 'px';
+    };
+
+    if(musicFiles.length) {
+        t = musicFiles.map(f => ({
+            u: `./mp3/${f}`,
+            n: f.replace(/\.mp3$/i, '').replace(/[^\u4e00-\u9fa5]/g,'') || f.replace(/\.mp3$/i, '')
+        }));
         
-        var contentEl = document.querySelector('.content');
-        var rect = contentEl.getBoundingClientRect();
-        if(touch.clientY < rect.top + 80) contentEl.scrollTop -= 15;
-        if(touch.clientY > rect.bottom - 80) contentEl.scrollTop += 15;
-        
-        dragGhost.style.display = 'none';
-        var target = document.elementFromPoint(touch.clientX, touch.clientY);
-        dragGhost.style.display = 'block';
-        
-        if(target) {
-            var dropTarget = target.closest('.' + dragListClass);
-            if(dropTarget && dropTarget !== dragSrcEl) {
-                var parent = dragSrcEl.parentNode;
-                var srcIdx = Array.prototype.indexOf.call(parent.children, dragSrcEl);
-                var tgtIdx = Array.prototype.indexOf.call(parent.children, dropTarget);
-                if(srcIdx < tgtIdx) parent.insertBefore(dragSrcEl, dropTarget.nextSibling);
-                else parent.insertBefore(dragSrcEl, dropTarget);
-                sortDirty = true;
-            }
-        }
-    }
-}
-
-function te(e) {
-    clearTimeout(longT);
-    if(pressingEl) pressingEl.classList.remove('pressing');
-    if(multiMode) return;
-    if(sortMode && isDragging) {
-        isDragging = false;
-        if(dragGhost) { dragGhost.parentNode.removeChild(dragGhost); dragGhost = null; }
-        if(dragSrcEl) { dragSrcEl.style.opacity = '1'; dragSrcEl = null; }
-        
-        var els = document.querySelectorAll(curType==='img' ? '#img-list .img-item' : '#audio-list .audio-item');
-        var newArr = [];
-        for(var i=0; i<els.length; i++) newArr.push(els[i].getAttribute('data-name'));
-        if(curType==='img') activeImgs = newArr; else activeAudio = newArr;
-    }
-}
-
-function iClk(n, el) {
-    if(window.touchScrolling || isLongPress || sortMode) return;
-    if(multiMode) {
-        var ix = selItems.indexOf(n);
-        if(ix===-1) { selItems.push(n); el.classList.add('sel'); }
-        else { selItems.splice(ix,1); el.classList.remove('sel'); }
-    }
-}
-
-var curAudioName = '';
-
-function aClk(n, u, el) {
-    if(window.touchScrolling || isLongPress || sortMode) return;
-    if(multiMode) {
-        var ix = selItems.indexOf(n);
-        if(ix===-1) { selItems.push(n); el.classList.add('sel'); }
-        else { selItems.splice(ix,1); el.classList.remove('sel'); }
-    } else {
-        // 去除文件后缀名
-        var nameNoExt = n.substring(0, n.lastIndexOf('.'));
-        if (!nameNoExt) nameNoExt = n; // 防止遇到无后缀文件时变为空
-        curAudioName = nameNoExt;
-
-        if(playPath === u) { 
-            if(audioObj.paused) {
-                msg(nameNoExt + ' 加载中...', true);
-                audioObj.play().catch(function(){}); 
-            } else { 
-                audioObj.pause(); 
-                msg('已停止播放: ' + nameNoExt);
-            } 
-        } else { 
-            msg(nameNoExt + ' 加载中...', true);
-            audioObj.src = u; 
-            audioObj.play().catch(function(){}); 
-            playPath = u; 
-        }
-        renderMedia();
-    }
-}
-
-function playA(u) {} 
-
-// 监听缓冲完成，真正开始出声的瞬间
-audioObj.onplaying = function() { 
-    msg('正在播放: ' + curAudioName);
-    renderMedia(); 
-};
-
-audioObj.onpause = function() { 
-    renderMedia(); 
-};
-
-audioObj.onended = function() { 
-    renderMedia(); 
-};
-
-audioObj.onerror = function() { 
-    msg('音频加载失败');
-    renderMedia(); 
-};
-
-
-
-function openBs() {
-    var m = document.getElementById('bs-menu');
-    var h = '';
-    
-    if(curType === 'img') {
-        if(curIsActive) {
-            h += '<div class="bs-item" onclick="startSort(\'img\')">排序</div>';
-            h += '<div class="bs-item" onclick="safeAction(\'置顶图片\', \'置顶图片将排在首位\', doPin)">置顶</div>';
-            h += '<div class="bs-item" onclick="openRename()">重命名</div>';
-            h += '<div class="bs-item" onclick="startMulti(true)">多选</div>';
-            h += '<div class="bs-item" style="color:var(--danger);" onclick="safeAction(\'移至素材\', \'确认移出首页展示吗？\', function(){disA(\'img\', \''+curName+'\')})">禁用</div>';
-        } else {
-            h += '<div class="bs-item" style="color:var(--safe);" onclick="enM(\'img\', \''+curName+'\')">启用</div>';
-            h += '<div class="bs-item" onclick="openRename()">重命名</div>';
-            h += '<div class="bs-item" onclick="startMulti(false)">多选</div>';
-            h += '<div class="bs-item" style="color:var(--danger);" onclick="safeAction(\'删除\', \'不可恢复，确认执行吗？\', function(){commitDelRaw(\''+curPath+'\',\''+curSha+'\',\''+curName+'\')})">删除</div>';
-        }
-    } else if(curType === 'audio') {
-        if(curIsActive) {
-            h += '<div class="bs-item" onclick="startSort(\'audio\')">排序</div>';
-            h += '<div class="bs-item" onclick="openRename()">重命名</div>';
-            h += '<div class="bs-item" onclick="startMulti(true)">多选</div>';
-            h += '<div class="bs-item" style="color:var(--danger);" onclick="safeAction(\'移至素材\', \'确认移出首页展示吗？\', function(){disA(\'audio\', \''+curName+'\')})">禁用</div>';
-        } else {
-            h += '<div class="bs-item" style="color:var(--safe);" onclick="enM(\'audio\', \''+curName+'\')">启用</div>';
-            h += '<div class="bs-item" onclick="openRename()">重命名</div>';
-            h += '<div class="bs-item" onclick="startMulti(false)">多选</div>';
-            h += '<div class="bs-item" style="color:var(--danger);" onclick="safeAction(\'删除\', \'不可恢复，确认执行吗？\', function(){commitDelRaw(\''+curPath+'\',\''+curSha+'\',\''+curName+'\')})">删除</div>';
-        }
-    }
-    h += '<div class="bs-item" style="border-top:6px solid #0a0a0a;" onclick="clsBs()">取消</div>';
-    
-    openBsMenu('bs-menu');
-    m.innerHTML = h;
-}
-
-
-
-function openBsMenu(id) {
-    document.getElementById('bs-overlay').classList.add('show');
-    document.getElementById(id).classList.add('show');
-}
-
-function clsBs() { 
-    document.getElementById('bs-overlay').classList.remove('show');
-    document.querySelectorAll('.bs-menu').forEach(function(el){ el.classList.remove('show'); });
-}
-
-function cls(id) { document.getElementById(id).style.display = 'none'; }
-
-
-
-function playA(u) {
-    if(isLongPress || sortMode) return;
-    if(playPath === u) { 
-        if(audioObj.paused) audioObj.play(); else audioObj.pause(); 
-    } else { 
-        audioObj.src = u; audioObj.play(); playPath = u; 
-    }
-    renderMedia();
-}
-audioObj.onended = function() { renderMedia(); };
-audioObj.onpause = function() { renderMedia(); };
-audioObj.onplay = function() { renderMedia(); };
-
-function startSort(type) {
-    clsBs();
-    sortMode = true; 
-    curSortTab = type;
-    
-    var sb = document.getElementById('sort-bar');
-    sb.removeAttribute('style');
-    sb.style.display = 'flex';
-    
-    document.body.classList.add('sort-mode');
-    renderMedia();
-    msg('长按任意文件开始拖拽');
-}
-
-function cancelSort() {
-    parseIdx();
-    sortMode = false; sortDirty = false; curSortTab = '';
-    document.getElementById('sort-bar').style.display = 'none';
-    document.body.classList.remove('sort-mode');
-    renderMedia();
-}
-function commitSort() {
-    saveIdx(false).then(function(){
-        sortMode = false; sortDirty = false; curSortTab = '';
-        document.getElementById('sort-bar').style.display = 'none';
-        document.body.classList.remove('sort-mode');
-        renderMedia();
-        msg('排布顺序已保存');
-    });
-}
-
-function doPin() {
-    msg('处理中...', true);
-    var ix = activeImgs.indexOf(curName);
-    if(ix!==-1) {
-        activeImgs.splice(ix, 1);
-        if(curName!=='迟来的深情.jpg') {
-            var hIx = activeImgs.indexOf('迟来的深情.jpg');
-            if(hIx!==-1) activeImgs.splice(hIx+1, 0, curName); else activeImgs.unshift(curName);
-        } else activeImgs.unshift(curName);
-        saveIdx(true).then(function(){ renderMedia(); hideMsg(); });
-    }
-}
-
-
-
-
-
-
-
-
-function renderUpList() {
-    var h = '';
-    for(var i=0; i<upQueue.length; i++) {
-        var q = upQueue[i];
-        h += '<div class="up-item"><input type="text" value="'+q.name+'" onchange="upQueue['+i+'].name=this.value"><span style="color:var(--dim)">'+q.ext+'</span><div class="icon-btn danger" onclick="upQueue.splice('+i+',1);renderUpList();"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></div></div>';
-    }
-    document.getElementById('up-list').innerHTML = h;
-    if(upQueue.length === 0) document.getElementById('m-up').style.display = 'none';
-}
-
-
-function commitUp() {
-    document.getElementById('m-up').style.display = 'none';
-    msg('编码读取中...', true);
-    var targetAct = document.getElementById('up-target').checked;
-    var c = 0;
-    function readN() {
-        if(c >= upQueue.length) return doSeqUp(targetAct);
-        var fr = new FileReader();
-        fr.onload = function(e) { 
-            upQueue[c].b64 = e.target.result.split(',')[1]; 
-            c++; 
-            readN(); 
-        };
-        fr.readAsDataURL(upQueue[c].file);
-    }
-    readN();
-}
-
-
-
-
-
-function saveIdx(skipM) {
-    if(!skipM) msg('保存中...', true);
-    var rI = /(const rawImageFiles = \[)([\s\S]*?)(\];)/;
-    var rA = /(const musicFiles = \[)([\s\S]*?)(\];)/;
-    var nH = idxHtml;
-    
-    var strI = ''; for(var i=0; i<activeImgs.length; i++) { strI += "'" + activeImgs[i] + "'"; if(i!==activeImgs.length-1) strI += ',\n        '; }
-    var strA = ''; for(var j=0; j<activeAudio.length; j++) { strA += "'" + activeAudio[j] + "'"; if(j!==activeAudio.length-1) strA += ',\n        '; }
-    
-    nH = nH.replace(rI, '$1\n        ' + strI + '\n    $3');
-    nH = nH.replace(rA, '$1\n        ' + strA + '\n    $3');
-    
-    nH = nH.replace(/const imageFiles\s*=\s*rawImageFiles\.sort\([\s\S]*?\}\);/g, 'const imageFiles = rawImageFiles;');
-    nH = nH.replace(/const musicSorter\s*=\s*\([^)]*\)\s*=>\s*[^;]+;/g, '');
-    nH = nH.replace(/if\s*\(musicFiles\.length\)\s*musicFiles\.sort\(musicSorter\);/g, '');
-    
-    return api('/contents/index.html', 'PUT', {message:'Sync Media', content:bE(nH), sha:idxSha}).then(function(r){ 
-        idxSha=r.content.sha; 
-        idxHtml=nH; 
-        bumpCacheVer();
-        if(!skipM){renderMedia();hideMsg();} 
-    });
-}
-
-var multiIsActive = true, multiType = 'img';
-
-function startMulti(isActive) {
-    clsBs(); 
-    multiMode = true; 
-    selItems = []; 
-    multiIsActive = isActive;
-    multiType = curType;
-    isLongPress = false; 
-
-    var mb = document.getElementById('multi-bar');
-    mb.removeAttribute('style'); 
-    mb.style.display = 'flex';
-    
-    var bs = 'opacity:0.4; pointer-events:none; transition:all 0.2s;';
-    
-    var h = '<button class="btn-cancel" onclick="cancelMulti()">取消</button>';
-    if(multiIsActive) {
-        h += '<button id="btn-m-dis" onclick="safeAction(\'移至素材\', \'确认禁用？\', doMultiDisable)" style="background:var(--accent); color:#000; ' + bs + '">禁用</button>';
-    } else {
-        h += '<button id="btn-m-del" onclick="safeAction(\'彻底删除\', \'确认删除？\', doMultiDelete)" style="background:transparent; color:var(--danger); border:1px solid var(--danger); ' + bs + '">删除</button>';
-        h += '<button id="btn-m-pub" onclick="openMultiPub()" style="background:var(--safe); color:#000; ' + bs + '">发布</button>';
-    }
-    mb.innerHTML = h;
-    msg('请点击选择');
-
-    if(!window.mcBnd) {
-        document.addEventListener('click', function() {
-            if(!multiMode) return;
-            setTimeout(function() {
-                var on = selItems.length > 0;
-                var op = on ? '1' : '0.4';
-                var pe = on ? 'auto' : 'none';
-                var b1 = document.getElementById('btn-m-dis');
-                if(b1) { b1.style.opacity = op; b1.style.pointerEvents = pe; }
-                var b2 = document.getElementById('btn-m-del');
-                if(b2) { b2.style.opacity = op; b2.style.pointerEvents = pe; }
-                var b3 = document.getElementById('btn-m-pub');
-                if(b3) { b3.style.opacity = op; b3.style.pointerEvents = pe; }
-            }, 50);
+        t.forEach((s,i)=>{
+            let d=document.createElement('div');
+            d.className='mi';
+            d.textContent=s.n;
+            d.onclick=()=>{ld(i);ml.classList.remove('show');setTimeout(()=>ml.style.display='none',300)};
+            ml.appendChild(d);
         });
-        window.mcBnd = true;
+        u.src = t[0].u; 
+        if('mediaSession' in navigator){
+            navigator.mediaSession.metadata = new MediaMetadata({
+                title: t[0].n, artist: 'KSX ZH',
+                artwork: [{ 
+  src: './logo/favicon.ico', 
+  sizes: '192x192', 
+  type: 'image/x-icon' 
+}]
+            });
+        }
     }
-}
 
+    window.addEventListener('popstate', () => {
+        v.style.display = 'none';
+        lv.style.display = 'none';
+        document.body.style.overflow = '';
+    });
 
+    const closeViewer = (e) => {
+        if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        if(v.style.display !== 'none' || lv.style.display !== 'none') {
+            history.back();
+        }
+    };
 
+    const extStyle = document.createElement('style');
+    extStyle.textContent = `
+        @keyframes slideNext { 
+            0% { opacity: 0; transform: translateY(15px); } 
+            100% { opacity: 1; transform: translateY(0); } 
+        }
+        @keyframes slidePrev { 
+            0% { opacity: 0; transform: translateY(-15px); } 
+            100% { opacity: 1; transform: translateY(0); } 
+        }
+        @keyframes softZoom { 
+            0% { opacity: 0; transform: scale(0.98); } 
+            100% { opacity: 1; transform: scale(1); } 
+        }
+    `;
+    document.head.appendChild(extStyle);
 
-
-
-
-function cancelMulti() {
-    multiMode = false; selItems = [];
-    document.getElementById('multi-bar').style.display='none';
-    var items = document.querySelectorAll('.img-item, .audio-item');
-    for(var i=0; i<items.length; i++) items[i].classList.remove('sel');
-}
-
-function doMultiDisable() {
-    for(var i=0; i<selItems.length; i++) {
-        var ix = activeImgs.indexOf(selItems[i]);
-        if(ix!==-1) activeImgs.splice(ix,1);
+    let currentImgIndex = -1;
+    let vImg = v.querySelector('img');
+    if (!vImg) {
+        vImg = document.createElement('img');
+        v.appendChild(vImg);
     }
-    saveIdx().then(cancelMulti);
-}
+    vImg.decoding = 'async';
+    li.decoding = 'async';
 
-function openMultiPub() {
-    if(selItems.length === 0) return msg('请先选择文件');
-    document.getElementById('m-multi-pub').style.display = 'flex';
-}
+    const pCache = new Set();
+const preloadImage = (idx) => {
+    if (!imageFiles.length) return;
+    let i = (idx + imageFiles.length) % imageFiles.length;
+    const src = `./img/${imageFiles[i]}`;
+    if (pCache.has(src)) return;
+    const img = new Image();
+    img.src = src;
+    pCache.add(src);
+};
 
-function doMultiEnable(pos) {
-    document.getElementById('m-multi-pub').style.display = 'none';
-    msg('处理中...', true);
-    var arr = multiType === 'img' ? activeImgs : activeAudio;
+const showImage = (index, dir) => {
+    index = (index + imageFiles.length) % imageFiles.length;
+    currentImgIndex = index;
+    const f = imageFiles[index];
+    const imgSrc = `./img/${f}`;
+    let target;
     
-    var toAdd = [];
-    for(var i=0; i<selItems.length; i++) {
-        if(arr.indexOf(selItems[i]) === -1) toAdd.push(selItems[i]);
-    }
-    
-    if(pos === 'end') {
-        for(var j=0; j<toAdd.length; j++) arr.push(toAdd[j]);
+    if (f.includes('迟来的深情')) {
+        v.style.display = 'none';
+        li.src = imgSrc;
+        lv.style.display = 'block';
+        lv.scrollTop = 0;
+        target = li;
     } else {
-        if(multiType === 'img') {
-            for(var k=toAdd.length-1; k>=0; k--) {
-                var item = toAdd[k];
-                if(item === '迟来的深情.jpg') {
-                    arr.unshift(item);
-                } else {
-                    var currSfIdx = arr.indexOf('迟来的深情.jpg');
-                    if(currSfIdx !== -1) arr.splice(currSfIdx + 1, 0, item);
-                    else arr.unshift(item);
+        lv.style.display = 'none';
+        vImg.src = imgSrc;
+        v.style.display = 'flex';
+        target = vImg;
+    }
+
+    target.style.animation = 'none';
+    void target.offsetWidth;
+    //上下滑动时间
+    if (dir === 'next') target.style.animation = 'slideNext 0.4s ease-out forwards';
+      //点击显示时间
+    else if (dir === 'prev') target.style.animation = 'slidePrev 0.4s ease-out forwards';
+    else target.style.animation = 'softZoom 0.3s ease-out forwards';
+    
+    preloadImage(index + 1);
+    preloadImage(index - 1);
+};
+
+    let startY = 0;
+    let startTime = 0;
+    let wheelLock = false;
+
+    [v, lv].forEach(el => {
+        el.addEventListener('wheel', (e) => {
+            if (wheelLock) return;
+            if (el === v) {
+                e.preventDefault();
+                wheelLock = true;
+                showImage(currentImgIndex + (e.deltaY > 0 ? 1 : -1), e.deltaY > 0 ? 'next' : 'prev');
+                setTimeout(() => { wheelLock = false; }, 400);
+            } else if (el === lv) {
+                if (e.deltaY > 0 && (lv.scrollHeight - lv.scrollTop - lv.clientHeight <= 5)) {
+                    wheelLock = true;
+                    showImage(currentImgIndex + 1, 'next');
+                    setTimeout(() => { wheelLock = false; }, 400);
+                } else if (e.deltaY < 0 && lv.scrollTop <= 5) {
+                    wheelLock = true;
+                    showImage(currentImgIndex - 1, 'prev');
+                    setTimeout(() => { wheelLock = false; }, 400);
                 }
             }
+        }, {passive: false});
+
+        el.addEventListener('touchstart', (e) => {
+            startY = e.touches[0].clientY;
+            startTime = Date.now();
+            isSwiping = false;
+        }, {passive: true});
+        
+        el.addEventListener('touchmove', (e) => {
+            if (Math.abs(e.touches[0].clientY - startY) > 10) {
+                isSwiping = true;
+                if (el === v && e.cancelable) e.preventDefault();
+            }
+        }, {passive: false});
+        
+        el.addEventListener('touchend', (e) => {
+            if (!isSwiping) return; 
+            
+            let diffY = startY - e.changedTouches[0].clientY;
+            let timeTaken = Date.now() - startTime;
+            
+            if (Math.abs(diffY) > 40 && timeTaken < 500) {
+                if (el === v) {
+                    showImage(currentImgIndex + (diffY > 0 ? 1 : -1), diffY > 0 ? 'next' : 'prev');
+                } else if (el === lv) {
+                    if (diffY > 0 && (lv.scrollHeight - lv.scrollTop - lv.clientHeight <= 5)) {
+                        showImage(currentImgIndex + 1, 'next');
+                    } else if (diffY < 0 && lv.scrollTop <= 5) {
+                        showImage(currentImgIndex - 1, 'prev');
+                    }
+                }
+            }
+            setTimeout(() => { isSwiping = false; }, 50);
+        });
+    });
+
+ const renderAllPerfectly = () => {
+    if (!imageFiles.length) return;
+    const container = document.getElementById('c');
+    const frag = document.createDocumentFragment();
+    const refreshSvg = `
+        <svg class="status-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="0.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21.3687 13.5827C21.4144 13.3104 21.2306 13.0526 20.9583 13.0069C20.686 12.9612 20.4281 13.1449 20.3825 13.4173L21.3687 13.5827ZM12 20.5C7.30558 20.5 3.5 16.6944 3.5 12H2.5C2.5 17.2467 6.75329 21.5 12 21.5V20.5ZM3.5 12C3.5 7.30558 7.30558 3.5 12 3.5V2.5C6.75329 2.5 2.5 6.75329 2.5 12H3.5ZM12 3.5C15.3367 3.5 18.2252 5.4225 19.6167 8.22252L20.5122 7.77748C18.9583 4.65062 15.7308 2.5 12 2.5V3.5ZM20.3825 13.4173C19.7081 17.437 16.2112 20.5 12 20.5V21.5C16.7077 21.5 20.6148 18.0762 21.3687 13.5827L20.3825 13.4173Z"/>
+<path d="M20.4716 2.42157V8.07843H14.8147"></path>
+        </svg>`;
+
+    const scrollObs = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const w = entry.target;
+                if (!w.dataset.triggered) {
+                    w.loadImg();
+                    w.dataset.triggered = 'true';
+                }
+                scrollObs.unobserve(w);
+            }
+        });
+    }, { rootMargin: '600px 0px', threshold: 0.01 });
+
+    imageFiles.forEach((fileName, globalIndex) => {
+        const isHero = fileName.includes('迟来的深情');
+        const w = document.createElement('div');
+        w.className = isHero ? 'img-wrap hero' : 'img-wrap';
+        w.innerHTML = refreshSvg;
+        
+        const img = new Image();
+        img.decoding = 'async';
+        img.loading = 'lazy';
+        
+        if (globalIndex < 8) {
+            img.fetchPriority = "high";
         } else {
-            for(var k=toAdd.length-1; k>=0; k--) arr.unshift(toAdd[k]);
+            img.fetchPriority = "low";
         }
-    }
+
+        w.loadImg = () => {
+            w.classList.remove('error', 'loaded');
+            img.src = `./img/${fileName}${w.dataset.retry ? '?t=' + Date.now() : ''}`;
+            w.dataset.retry = 'true';
+            
+            img.decode().then(() => {
+                w.classList.add('loaded');
+            }).catch(() => {
+                if(img.complete) w.classList.add('loaded');
+            });
+        };
+
+        img.onerror = () => {
+            w.classList.remove('loaded');
+            w.classList.add('error');
+            img.removeAttribute('src');
+        };
+
+        w.onclick = (e) => {
+            if (w.classList.contains('loaded')) {
+                if (e) { e.preventDefault(); e.stopPropagation(); }
+                if (u.paused && !mp) u.play().catch(() => {});
+                history.pushState({modal: true}, null, '');
+                document.body.style.overflow = 'hidden';
+                showImage(globalIndex, 'none');
+            } else if (w.classList.contains('error')) {
+                w.loadImg();
+            }
+        };
+
+        w.appendChild(img);
+        frag.appendChild(w);
+        scrollObs.observe(w);
+    });
+
+    container.appendChild(frag);
+    v.onclick = closeViewer;
+    lv.onclick = closeViewer;
+};
+renderAllPerfectly();
+
+    q.onclick=pp;
+    b.onclick=()=>{ld(c-1)};
+    n.onclick=()=>{ld(c+1)};
     
-    saveIdx(true).then(function(){
-        cancelMulti();
-        loadData();
-        msg('已发布至网站');
+    document.addEventListener('click',(e)=>{
+        if(!inited && t.length) initAudio();
+        if(ac && ac.state === 'suspended') ac.resume();
+    });
+}();
+</script>
+
+
+<script src="./js/分手时间.js"></script>
+<script src="./js/樱花特效.js"></script>
+<script src="./js/水波纹点击特效.js"></script>
+<script src="./js/图片呼吸特效.js"></script>
+<script src="./js/雨落特效.js"></script>
+<script>
+//注销缓存执行脚本
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then(function(rs) {
+        for(var i=0; i<rs.length; i++) rs[i].unregister();
     });
 }
-
-
-
-
-function doMultiDisable() {
-    for(var i=0; i<selItems.length; i++) {
-        var ix = activeImgs.indexOf(selItems[i]);
-        if(ix!==-1) activeImgs.splice(ix,1);
-    }
-    saveIdx().then(cancelMulti);
-}
-
-
-
-function disA(t, n) {
-    msg('处理中...', true);
-    var arr = t === 'img' ? activeImgs : activeAudio;
-    var ix = arr.indexOf(n); 
-    if(ix !== -1) { arr.splice(ix, 1); saveIdx(true).then(loadData); }
-}
-
-function enM(t, n) {
-    clsBs();
-    selItems = [n];
-    multiType = t;
-    openMultiPub();
-}
-
-
-function tab(id, el, t) {
-    clsAll();
-    var ps = document.querySelectorAll('.panel'); for(var i=0; i<ps.length; i++) ps[i].classList.remove('active');
-    document.getElementById(id).classList.add('active');
-    var bs = document.querySelectorAll('.nav-btn'); for(var j=0; j<bs.length; j++) bs[j].classList.remove('active');
-    el.classList.add('active'); document.getElementById('h-title').innerText=t;
-}
-
-if(tk) { document.getElementById('v-login').classList.remove('active'); document.getElementById('v-app').classList.add('active'); loadData(); }
 </script>
 </body>
 </html>

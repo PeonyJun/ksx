@@ -221,7 +221,7 @@ img:not([src]), img[src=""], img:-moz-broken {
     object-fit: contain; border-radius: 3px;
     box-shadow: 0 20px 80px rgba(0,0,0,0.8);
     animation: zoomIn 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
-    transition: none;
+    transition: opacity 0.3s ease;
     filter: none;
 }
 
@@ -974,21 +974,22 @@ body.intro-lock { overflow: hidden; }
     const extStyle = document.createElement('style');
     extStyle.textContent = `
         @keyframes slideNext { 
-            0% { opacity: 0; transform: translateY(15px); } 
-            100% { opacity: 1; transform: translateY(0); } 
+            0% { transform: translateY(15px); } 
+            100% { transform: translateY(0); } 
         }
         @keyframes slidePrev { 
-            0% { opacity: 0; transform: translateY(-15px); } 
-            100% { opacity: 1; transform: translateY(0); } 
+            0% { transform: translateY(-15px); } 
+            100% { transform: translateY(0); } 
         }
         @keyframes softZoom { 
-            0% { opacity: 0; transform: scale(0.98); } 
-            100% { opacity: 1; transform: scale(1); } 
+            0% { transform: scale(0.98); } 
+            100% { transform: scale(1); } 
         }
     `;
     document.head.appendChild(extStyle);
 
     let currentImgIndex = -1;
+    let imgToken = 0;
     let vImg = v.querySelector('img');
     if (!vImg) {
         vImg = document.createElement('img');
@@ -1012,6 +1013,11 @@ const showImage = (index, dir) => {
     currentImgIndex = index;
     const f = imageFiles[index];
     const imgSrc = `./img/${f}`;
+    // 防残留/竞态：自增 token，只有最新一次加载完成才真正显示，避免短暂显示上一张/错图
+    const token = ++imgToken;
+    vImg.style.opacity = '0';
+    vImg.onload = () => { if (token === imgToken) vImg.style.opacity = '1'; };
+    vImg.onerror = () => { if (token === imgToken) vImg.style.opacity = '1'; };
     vImg.src = imgSrc;
     v.style.display = 'flex';
     const target = vImg;
@@ -1023,24 +1029,15 @@ const showImage = (index, dir) => {
       //点击显示时间
     else if (dir === 'prev') target.style.animation = 'slidePrev 0.4s ease-out forwards';
     else target.style.animation = 'softZoom 0.3s ease-out forwards';
-    
+
     preloadImage(index + 1);
     preloadImage(index - 1);
 };
 
     let startY = 0;
     let startTime = 0;
-    let wheelLock = false;
 
     [v].forEach(el => {
-        el.addEventListener('wheel', (e) => {
-            if (wheelLock) return;
-            e.preventDefault();
-            wheelLock = true;
-            showImage(currentImgIndex + (e.deltaY > 0 ? 1 : -1), e.deltaY > 0 ? 'next' : 'prev');
-            setTimeout(() => { wheelLock = false; }, 400);
-        }, {passive: false});
-
         el.addEventListener('touchstart', (e) => {
             startY = e.touches[0].clientY;
             startTime = Date.now();
@@ -1171,6 +1168,20 @@ renderAllPerfectly();
 (function () {
     var intro = document.getElementById('intro');
     if (!intro) return;
+
+    // 进入页 15 天内只显示一次：看过之后直接跳过，避免每次访问都被开场拦住
+    var INTRO_KEY = 'ksx_intro_seen_at';
+    var INTRO_TTL = 15 * 24 * 60 * 60 * 1000; // 15 天(毫秒)
+    var lastSeen = 0;
+    try { lastSeen = parseInt(localStorage.getItem(INTRO_KEY) || '0', 10) || 0; } catch (e) {}
+    if (lastSeen && (Date.now() - lastSeen) < INTRO_TTL) {
+        intro.remove();
+        document.body.classList.remove('intro-lock');
+        return;
+    }
+    // 本次展示即记录时间戳，15 天内不再重复出现
+    try { localStorage.setItem(INTRO_KEY, String(Date.now())); } catch (e) {}
+
     var t0 = Date.now();
     document.body.classList.add('intro-lock');
 

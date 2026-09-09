@@ -2,16 +2,18 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
+<script>/* 资源加速：统一走 gh-proxy 代理 GitHub raw */
+var ASSET_BASE = 'https://gh-proxy.org/https://raw.githubusercontent.com/PeonyJun/ksx/main/';</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<link rel="shortcut icon" href="./logo/favicon.ico" type="image/x-icon">
-<link rel="icon" href="./logo/favicon.ico" type="image/x-icon">
+<link rel="shortcut icon" href="https://gh-proxy.org/https://raw.githubusercontent.com/PeonyJun/ksx/main/logo/favicon.ico" type="image/x-icon">
+<link rel="icon" href="https://gh-proxy.org/https://raw.githubusercontent.com/PeonyJun/ksx/main/logo/favicon.ico" type="image/x-icon">
 <title>阚双雪 - 邹洪 - 温故流年 - 自我感动</title>
 <meta name="description" content="这里是邹洪对阚双雪的专属回忆相册，记录一路走来的日常点滴，收藏两个人所有过往瞬间、心事与美好，把曾经的点点滴滴好好留存，定格属于彼此简单珍贵的回忆。">
 <meta property="og:title" content="阚双雪 - 邹洪 - 温故流年 - 自我感动">
 <meta property="og:description" content="这里是邹洪对阚双雪的专属回忆相册，记录一路走来的日常点滴，收藏两个人所有过往瞬间、心事与美好，把曾经的点点滴滴好好留存，定格属于彼此简单珍贵的回忆。">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="温故流年">
-<meta property="og:image" content="./img/阚双雪_66.jpg">
+<meta property="og:image" content="https://gh-proxy.org/https://raw.githubusercontent.com/PeonyJun/ksx/main/img/阚双雪_66.jpg">
 <meta property="og:image:width" content="2160">
 <meta property="og:image:height" content="1440">
 <meta property="og:image:alt" content="回忆相册封面">
@@ -22,7 +24,7 @@
   "@type": "WebPage",
   "headline": "阚双雪 - 邹洪 - 温故流年 - 自我感动",
   "description": "这里是邹洪对阚双雪的专属回忆相册，记录一路走来的日常点滴，收藏两个人所有过往瞬间、心事与美好，把曾经的点点滴滴好好留存，定格属于彼此简单珍贵的回忆。",
-  "image": "./img/阚双雪_66.jpg",
+  "image": "https://gh-proxy.org/https://raw.githubusercontent.com/PeonyJun/ksx/main/img/阚双雪_66.jpg",
   "author": {
     "@type": "Person",
     "name": "邹洪"
@@ -642,7 +644,7 @@ body.intro-lock { overflow: hidden; }
     </div>
 </div>
 
-<audio id="a" hidden preload="auto" playsinline x-webkit-airplay="allow"></audio>
+<audio id="a" hidden preload="auto" playsinline x-webkit-airplay="allow" crossorigin="anonymous"></audio>
 
 <script>
 !function(){
@@ -880,7 +882,7 @@ body.intro-lock { overflow: hidden; }
             navigator.mediaSession.metadata = new MediaMetadata({
                 title: t[c].n, artist: 'KSX ZH',
                 artwork: [{ 
-  src: './logo/favicon.ico', 
+  src: ASSET_BASE + 'logo/favicon.ico', 
   sizes: '192x192', 
   type: 'image/x-icon' 
 }]
@@ -932,7 +934,7 @@ body.intro-lock { overflow: hidden; }
 
     if(musicFiles.length) {
         t = musicFiles.map(f => ({
-            u: `./mp3/${f}`,
+            u: `${ASSET_BASE}mp3/${f}`,
             n: f.replace(/\.mp3$/i, '').replace(/[^\u4e00-\u9fa5]/g,'') || f.replace(/\.mp3$/i, '')
         }));
         
@@ -948,7 +950,7 @@ body.intro-lock { overflow: hidden; }
             navigator.mediaSession.metadata = new MediaMetadata({
                 title: t[0].n, artist: 'KSX ZH',
                 artwork: [{ 
-  src: './logo/favicon.ico', 
+  src: ASSET_BASE + 'logo/favicon.ico', 
   sizes: '192x192', 
   type: 'image/x-icon' 
 }]
@@ -1001,7 +1003,7 @@ body.intro-lock { overflow: hidden; }
 const preloadImage = (idx) => {
     if (!imageFiles.length) return;
     let i = (idx + imageFiles.length) % imageFiles.length;
-    const src = `./img/${imageFiles[i]}`;
+    const src = `${ASSET_BASE}img/${imageFiles[i]}`;
     if (pCache.has(src)) return;
     const img = new Image();
     img.src = src;
@@ -1012,7 +1014,7 @@ const showImage = (index, dir) => {
     index = (index + imageFiles.length) % imageFiles.length;
     currentImgIndex = index;
     const f = imageFiles[index];
-    const imgSrc = `./img/${f}`;
+    const imgSrc = `${ASSET_BASE}img/${f}`;
     // 防残留/竞态：自增 token，只有最新一次加载完成才真正显示，避免短暂显示上一张/错图
     const token = ++imgToken;
     vImg.style.opacity = '0';
@@ -1104,7 +1106,7 @@ const showImage = (index, dir) => {
 
         w.loadImg = () => {
             w.classList.remove('error', 'loaded');
-            img.src = `./img/thumbs/${fileName}${w.dataset.retry ? '?t=' + Date.now() : ''}`;
+            img.src = `${ASSET_BASE}img/thumbs/${fileName}${w.dataset.retry ? '?t=' + Date.now() : ''}`;
             w.dataset.retry = 'true';
             
             img.decode().then(() => {
@@ -1278,11 +1280,11 @@ renderAllPerfectly();
 // 现改为 window load 后、浏览器空闲时按原顺序注入；特效代码与呈现效果完全不变。
 (function () {
     var fxFiles = [
-        './js/分手时间.js',
-        './js/全屏/樱花特效.js',
-        './js/点击/水波纹点击特效.js',
-        './js/图片/图片呼吸特效.js',
-        './js/全屏/雨落特效.js'
+        ASSET_BASE + 'js/分手时间.js',
+        ASSET_BASE + 'js/全屏/樱花特效.js',
+        ASSET_BASE + 'js/点击/水波纹点击特效.js',
+        ASSET_BASE + 'js/图片/图片呼吸特效.js',
+        ASSET_BASE + 'js/全屏/雨落特效.js'
     ];
     var loaded = false;
     function loadFx() {

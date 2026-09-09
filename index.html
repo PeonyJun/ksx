@@ -1290,14 +1290,24 @@ renderAllPerfectly();
     function loadFx() {
         if (loaded) return;
         loaded = true;
-        var frag = document.createDocumentFragment();
-        fxFiles.forEach(function (src) {
-            var s = document.createElement('script');
-            s.src = src;
-            s.async = false; // 保持与原来一致的顺序执行
-            frag.appendChild(s);
-        });
-        document.body.appendChild(frag);
+        // gh-proxy 对 .js 返回 text/plain + nosniff，直接 <script src> 会被浏览器拒绝执行；
+        // 故改为 fetch 文本 -> Blob(application/javascript) -> 按原顺序依次执行，效果与原来一致。
+        var i = 0;
+        (function next() {
+            if (i >= fxFiles.length) return;
+            var src = fxFiles[i++];
+            fetch(src, { cache: 'force-cache' })
+                .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.text(); })
+                .then(function (code) {
+                    var url = URL.createObjectURL(new Blob([code], { type: 'application/javascript' }));
+                    var s = document.createElement('script');
+                    s.src = url;
+                    s.async = false;
+                    s.onload = s.onerror = function () { URL.revokeObjectURL(url); next(); };
+                    document.body.appendChild(s);
+                })
+                .catch(function () { next(); });
+        })();
     }
     function boot() {
         if ('requestIdleCallback' in window) {

@@ -11,7 +11,8 @@
  *     <script>
  *       window.GLASS_RAIN = {
  *         weather:    'rain',        // rain 大雨(默认) | drizzle 小雨 | sunny 晴 | storm 雷雨 | fallout 核雨
- *         base:       'https://www.zhksx.xyz/js/玻璃雨珠/',  // 纹理资源目录，末尾斜杠可省
+ *         base:       'https://www.zhksx.xyz/js/%E7%8E%BB%E7%92%83%E9%9B%A8%E7%8F%A0/',  // 纹理资源目录，末尾斜杠可省
+ *                     // 注意：路径含中文时必须用百分号编码，否则某些页面会因字符集问题 404
  *         zIndex:     -1,            // 层级：-1 在内容之后(默认)；看不到就试 0 或 1
  *         opacity:    1,             // 整体透明度 0~1
  *         background: '#05070d',     // 雨景底色（纹理未就绪时的兜底）
@@ -39,7 +40,9 @@
     var ROOT_ID = 'glass-rain';
     var CANVAS_ID = 'glass-rain-canvas';
 
-    var BASE = String(CFG.base || 'https://www.zhksx.xyz/js/玻璃雨珠/');
+    // 默认资源基址必须写成「百分号编码的纯 ASCII」：
+    // 外部 js 若未声明 charset，浏览器可能按 Windows-1252 解码，中文路径会变乱码导致 404。
+    var BASE = String(CFG.base || 'https://www.zhksx.xyz/js/%E7%8E%BB%E7%92%83%E9%9B%A8%E7%8F%A0/');
     if (BASE.slice(-1) !== '/') BASE += '/';
 
     var __GR_IMG_BASE__ = BASE;

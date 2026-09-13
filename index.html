@@ -1338,8 +1338,8 @@ renderAllPerfectly();
 })();
 </script>
 <!-- 背景特效：玻璃雨珠（WebGL 雨滴），源码位于 js/玻璃雨珠/。
-     用同源 <script src> 加载：本地 file:// 与线上 Pages 都能稳定执行。
-     （不用 fetch：file:// 下会被拦截；也不用 gh-proxy：其 .js 返回 text/plain 无法执行）-->
+     同源加载：本地 file:// 与线上 Pages 均可稳定执行。
+     不用 fetch（file:// 会被拦截），不用 gh-proxy（其 .js 返回 text/plain 无法执行）。-->
 <script src="js/玻璃雨珠/index.min.js" defer></script>
 <script>
 //注销缓存执行脚本

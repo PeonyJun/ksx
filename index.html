@@ -606,24 +606,12 @@ body.intro-lock { overflow: hidden; }
 
 </head>
 <body>
-<!-- 背景特效：玻璃雨珠（WebGL 雨滴，源码见 js/玻璃雨珠/）
-     默认关闭：容器 display:none 且不自动加载脚本。
-     在后台「插件」面板启用「玻璃雨珠」后，loadFx 会为其加上 .gr-on 显示容器。 -->
 <style>
 #glass-rain{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden;background:#05070d;display:none}
 #glass-rain.gr-on{display:block}
 #glass-rain .gr-deps{display:none}
 #glass-rain #container{position:absolute;top:0;left:0;display:block}
 </style>
-<div id="glass-rain" aria-hidden="true">
-    <canvas id="container"></canvas>
-    <div class="gr-deps">
-        <div class="slide slide--current" id="slide-1" data-weather="rain"></div>
-        <a href="#slide-1"></a>
-    </div>
-</div>
-
-
 <!-- ===== 开场：星夜回忆 ===== -->
 <div id="intro" class="intro">
   <div class="intro-bg"></div>

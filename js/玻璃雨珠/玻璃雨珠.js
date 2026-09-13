@@ -81,20 +81,6 @@
             return String(W.location.href).replace(/[?#].*$/, '').replace(/[^/]*$/, '');
         } catch (e) { return ''; }
     })();
-    // 纹理不一定在 js 同目录：很多站点把 js 丢进 data-js/ 之类的子目录，纹理却和页面同级。
-    // 所以除 js 目录外，再备一个「页面目录」候选，加载失败就依次换着试。
-    var __GR_PAGE_BASE__ = (function () {
-        try {
-            return String(W.location.href).replace(/[?#].*$/, '').replace(/[^/]*$/, '');
-        } catch (e) { return ''; }
-    })();
-    // 纹理不一定在 js 同目录：很多站点把 js 丢进 data-js/ 之类的子目录，纹理却和页面同级。
-    // 所以除 js 目录外，再备一个「页面目录」候选，加载失败就依次换着试。
-    var __GR_PAGE_BASE__ = (function () {
-        try {
-            return String(W.location.href).replace(/[?#].*$/, '').replace(/[^/]*$/, '');
-        } catch (e) { return ''; }
-    })();
     var __GR_IMG_BASE__ = BASE;
     var __GR_ALT_BASE__ = (BASE === CDN_BASE) ? '' : CDN_BASE;
     // 依次尝试的纹理根目录：js 目录 → 页面目录 → CDN
@@ -104,20 +90,8 @@
         if (__GR_ALT_BASE__ && a.indexOf(__GR_ALT_BASE__) < 0) a.push(__GR_ALT_BASE__);
         return a;
     })();
-    // 依次尝试的纹理根目录：js 目录 → 页面目录 → CDN
-    var __GR_BASES__ = (function () {
-        var a = [__GR_IMG_BASE__];
-        if (__GR_PAGE_BASE__ && a.indexOf(__GR_PAGE_BASE__) < 0) a.push(__GR_PAGE_BASE__);
-        if (__GR_ALT_BASE__ && a.indexOf(__GR_ALT_BASE__) < 0) a.push(__GR_ALT_BASE__);
-        return a;
-    })();
-    // 依次尝试的纹理根目录：js 目录 → 页面目录 → CDN
-    var __GR_BASES__ = (function () {
-        var a = [__GR_IMG_BASE__];
-        if (__GR_PAGE_BASE__ && a.indexOf(__GR_PAGE_BASE__) < 0) a.push(__GR_PAGE_BASE__);
-        if (__GR_ALT_BASE__ && a.indexOf(__GR_ALT_BASE__) < 0) a.push(__GR_ALT_BASE__);
-        return a;
-    })();
+    var __GR_IMG_BASE__ = BASE;
+    var __GR_ALT_BASE__ = (BASE === CDN_BASE) ? '' : CDN_BASE;
     var __GR_CANVAS__ = '#' + CANVAS_ID;
     var __GR_SEL__ = '#' + ROOT_ID + ' ';
     // 渲染分辨率：dprCap 是上限，再按「总像素上限」压一道 —— 4K / 视网膜屏配 dprCap=1.5

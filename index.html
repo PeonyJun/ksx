@@ -70,8 +70,8 @@ var ASSET_BASE = (function () {
     --accent-gold: #d4af37;
     --col-mobile-default: 4;
     --col-mobile-toggle: 5;
-    --col-pc-default: 6;
-    --col-pc-toggle: 10;
+    --col-pc-default: 11;
+    --col-pc-toggle: 13;
 }
 
 
@@ -124,7 +124,7 @@ body {
     grid-template-columns: repeat(var(--col-mobile-default), 1fr);
     grid-auto-flow: row dense; 
     gap: 8px; padding: 0 10px 100px;
-    max-width: 1920px; margin: 0 auto;
+    max-width: 1280px; margin: 0 auto;
     transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1);
 }
 #c.dense { grid-template-columns: repeat(var(--col-mobile-toggle), 1fr); }
@@ -137,8 +137,6 @@ body {
         gap: 16px; padding: 0 40px 120px;
     }
     #c.dense { grid-template-columns: repeat(var(--col-pc-toggle), 1fr); }
-    .img-wrap { contain-intrinsic-size: auto var(--thumb-h, 205px); }
-    #c.dense .img-wrap { contain-intrinsic-size: auto var(--thumb-h-dense, 170px); }
 }
 
 .img-wrap {
@@ -146,20 +144,12 @@ body {
     position: relative;
     border-radius: 3px;
     overflow: hidden;
-    /* 占位色：半透明，未加载时也透出身后的雨珠，不再是一块死黑 */
     background: rgba(18, 24, 36, 0.32);
     box-shadow: 0 1px 4px rgba(0,0,0,0.4);
     display: flex;
     align-items: center;
     justify-content: center;
     contain: content;
-    content-visibility: auto;
-    /* 高度由 JS 实测同步（--thumb-h），避免估算与实际不符造成页面高度抖动 */
-    contain-intrinsic-size: auto var(--thumb-h, 110px);
-}
-/* dense(5列)下卡片更小，尺寸估计贴近实际，避免滚动时布局反复修正 */
-#c.dense .img-wrap {
-    contain-intrinsic-size: auto var(--thumb-h-dense, 90px);
 }
 /* 仅在交互(悬停放大)时提升合成层，避免全列表常驻 80+ 合成层 */
 .img-wrap.loaded:hover {
@@ -1208,32 +1198,6 @@ const showImage = (index, dir) => {
 };
 renderAllPerfectly();
 
-// 布局稳定化：content-visibility 对离屏项使用估算高度，若估算与实测不符，
-// 首屏渲染/滚动时整页高度会变化，看起来就是"内容整体往下跳动一下"。
-// 这里实测缩略图真实高度并写入 CSS 变量，让估算值与实际完全一致。
-(function syncThumbMetrics() {
-    var grid = document.getElementById('c');
-    if (!grid) return;
-    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
-    var root = document.documentElement;
-    function setVar(name, px) {
-        if (px > 0 && root.style.getPropertyValue(name) !== px + 'px') {
-            root.style.setProperty(name, px + 'px');
-        }
-    }
-    function measure() {
-        var probe = grid.querySelector('.img-wrap');
-        if (probe) setVar('--thumb-h', probe.offsetHeight);
-        var dp = document.querySelector('#c.dense .img-wrap');
-        if (dp) setVar('--thumb-h-dense', dp.offsetHeight);
-    }
-    measure();
-    raf(measure);
-    setTimeout(measure, 400);
-    window.addEventListener('resize', function () { raf(measure); }, { passive: true });
-    window.addEventListener('orientationchange', function () { setTimeout(measure, 200); }, { passive: true });
-})();
-
     q.onclick=pp;
     b.onclick=()=>{ld(c-1)};
     n.onclick=()=>{ld(c+1)};
@@ -1261,7 +1225,6 @@ renderAllPerfectly();
     var intro = document.getElementById('intro');
     if (!intro) return;
 
-    // 进入页 15 天内只显示一次：看过之后直接跳过，避免每次访问都被开场拦住
     var INTRO_KEY = 'ksx_intro_seen_at';
     var INTRO_TTL = 15 * 24 * 60 * 60 * 1000; // 15 天(毫秒)
     var lastSeen = 0;
@@ -1271,8 +1234,11 @@ renderAllPerfectly();
         document.body.classList.remove('intro-lock');
         return;
     }
-    // 本次展示即记录时间戳，15 天内不再重复出现
     try { localStorage.setItem(INTRO_KEY, String(Date.now())); } catch (e) {}
+
+    if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+    window.scrollTo(0, 0);
+    window.addEventListener('pageshow', function () { window.scrollTo(0, 0); }, { passive: true });
 
     var t0 = Date.now();
     document.body.classList.add('intro-lock');
@@ -1348,10 +1314,9 @@ renderAllPerfectly();
         cancelAnimationFrame(raf);
         intro.classList.add('out');
         document.body.classList.remove('intro-lock');
+        window.scrollTo(0, 0);
         setTimeout(function () { intro.remove(); }, 680);
     }
-
-    // 诗句播完才响应点击；点击任意处进入（同时拦住主页水波纹特效的干扰）
     document.addEventListener('click', function (e) {
         if (!intro.isConnected) return;
         if (!e.target.closest('#intro')) return;
@@ -1365,9 +1330,6 @@ renderAllPerfectly();
 
 
 <script>
-// === 性能优化 A2：特效脚本延迟启动 ===
-// 原为 5 个同步 script，页面打开即全部执行，会与首屏图片解码抢占 CPU/GPU。
-// 现改为 window load 后、浏览器空闲时按原顺序注入；特效代码与呈现效果完全不变。
 (function () {
     var fxFiles = [
         ASSET_BASE + 'js/分手时间.js',
@@ -1376,36 +1338,38 @@ renderAllPerfectly();
         ASSET_BASE + 'js/图片/图片呼吸特效.js'
     ];
     var loaded = false;
+    function injectSrc(src) {
+        var s = document.createElement('script');
+        s.src = src;
+        s.async = false;
+        document.body.appendChild(s);
+    }
+    function injectCode(code) {
+        var url = URL.createObjectURL(new Blob([code], { type: 'application/javascript' }));
+        var s = document.createElement('script');
+        s.src = url;
+        s.async = false;
+        s.onload = s.onerror = function () { URL.revokeObjectURL(url); };
+        document.body.appendChild(s);
+    }
+    function fetchText(src) {
+        return fetch(src, { cache: 'force-cache' })
+            .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.text(); })
+            .catch(function () { return null; });
+    }
     function loadFx() {
         if (loaded) return;
         loaded = true;
-        // 相对基准（./ 本地模式）：同源 <script src> 直引，file:// 打开也能执行；
-        // 绝对基准（官方/代理）：gh-proxy 对 .js 返回 text/plain + nosniff，
-        //   直接 <script src> 会被浏览器拒绝执行，故 fetch 文本 -> Blob 再执行。
-        var i = 0;
-        (function next() {
-            if (i >= fxFiles.length) return;
-            var src = fxFiles[i++];
-            if (!/^https?:/i.test(src)) {
-                var s0 = document.createElement('script');
-                s0.src = src;
-                s0.async = false;
-                s0.onload = s0.onerror = function () { next(); };
-                document.body.appendChild(s0);
-                return;
+        var jobs = [], i;
+        for (i = 0; i < fxFiles.length; i++) {
+            if (/^https?:/i.test(fxFiles[i])) jobs.push(fetchText(fxFiles[i]));
+            else injectSrc(fxFiles[i]);
+        }
+        Promise.all(jobs).then(function (codes) {
+            for (var k = 0; k < codes.length; k++) {
+                if (codes[k]) injectCode(codes[k]);
             }
-            fetch(src, { cache: 'force-cache' })
-                .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.text(); })
-                .then(function (code) {
-                    var url = URL.createObjectURL(new Blob([code], { type: 'application/javascript' }));
-                    var s = document.createElement('script');
-                    s.src = url;
-                    s.async = false;
-                    s.onload = s.onerror = function () { URL.revokeObjectURL(url); next(); };
-                    document.body.appendChild(s);
-                })
-                .catch(function () { next(); });
-        })();
+        });
     }
     function boot() {
         if ('requestIdleCallback' in window) {

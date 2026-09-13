@@ -1121,8 +1121,66 @@ function plgItemHtml(it) {
         '<label class="switch"><input type="checkbox" ' + (act ? 'checked' : '') + ' onclick="event.preventDefault(); safeAction(\'状态控制\',\'确认执行该操作吗？\', function(){togPlg(\'' + rel + '\', ' + (act ? 'false' : 'true') + ')})"><span class="slider"></span></label></div>';
 }
 
+// ---------- 背景插件（背景层特效：独立 DOM + 同源 script 标签） ----------
+// 与普通特效不同点：背景插件需要自己的容器 DOM（层级在内容之下），
+// 且用同源 <script src> 加载（不能用 fxFiles 的 fetch 注入，否则本地打开不执行）。
+var BG_PLUGINS = [
+    {
+        id: 'glass-rain',
+        name: '玻璃雨珠',
+        desc: 'WebGL 雨滴 · 背景层',
+        script: 'js/玻璃雨珠/index.min.js',
+        block: [
+            '<div id="glass-rain" aria-hidden="true">',
+            '    <canvas id="container"></canvas>',
+            '    <div class="gr-deps">',
+            '        <div class="slide slide--current" id="slide-1" data-weather="rain"></div>',
+            '        <a href="#slide-1"></a>',
+            '    </div>',
+            '</div>',
+            '<scr' + 'ipt src="js/玻璃雨珠/index.min.js" defer></scr' + 'ipt>'
+        ].join('\n')
+    }
+];
+function bgIsOn(p) {
+    var re = new RegExp('<scr' + 'ipt[^>]*src\\s*=\\s*[\'"](?:\\.\\/)?' + escapeReg(p.script) + '[\'"]', 'i');
+    return re.test(idxHtml) || idxHtml.indexOf('id="glass-rain"') !== -1;
+}
+function bgRewrite(html, p, on) {
+    var scriptRe = new RegExp('<scr' + 'ipt[^>]*src\\s*=\\s*[\'"](?:\\.\\/)?' + escapeReg(p.script) + '[\'"][^>]*><\\/scr' + 'ipt>\\s*', 'ig');
+    var divRe = /<div id="glass-rain"[\s\S]*?<\/div>\s*<\/div>\s*/g;
+    var noteRe = /<!--\s*背景特效：玻璃雨珠[\s\S]*?-->\s*/g;
+    html = html.replace(scriptRe, '').replace(divRe, '').replace(noteRe, '');
+    if (on) html = html.replace(/<\/body>/i, '<!-- 背景特效：玻璃雨珠（WebGL 雨滴，源码见 js/玻璃雨珠/）-->\n' + p.block + '\n</body>');
+    return html;
+}
+function renderBgPlg() {
+    var h = '<div class="plg-group"><span>背景插件</span></div>';
+    BG_PLUGINS.forEach(function(p) {
+        var on = bgIsOn(p);
+        h += '<div class="plg-item"><div class="plg-name">' + p.name + ' <span class="plg-tag">' + p.desc + '</span></div>' +
+            '<label class="switch"><input type="checkbox" ' + (on ? 'checked' : '') +
+            ' onclick="event.preventDefault(); safeAction(\'背景插件\',\'确认' + (on ? '关闭' : '开启') + '「' + p.name + '」吗？\', function(){togBgPlg(\'' + p.id + '\')})">' +
+            '<span class="slider"></span></label></div>';
+    });
+    return h;
+}
+function togBgPlg(id) {
+    var p = null;
+    for (var i = 0; i < BG_PLUGINS.length; i++) { if (BG_PLUGINS[i].id === id) { p = BG_PLUGINS[i]; break; } }
+    if (!p) return;
+    var on = !bgIsOn(p);
+    var nH = bgRewrite(idxHtml, p, on);
+    msg('处理中...', true);
+    api('/contents/index.html', 'PUT', { message: (on ? 'Enable' : 'Disable') + ' BG plugin ' + p.name, content: bE(nH), sha: idxSha }).then(function(r) {
+        idxSha = r.content.sha; idxHtml = nH; renderPlg(); msg(on ? '背景插件已开启' : '背景插件已关闭');
+    }).catch(function() { msg('操作失败'); });
+}
+
 function renderPlg() {
     fxListAll().then(function(items) {
+        // 背景插件由「背景插件」分区单独管理，从普通特效列表剔除，避免重复/歧义
+        items = items.filter(function(it) { return it.dir !== '玻璃雨珠'; });
         // 分类目录：已定义顺序优先，未知目录排后
         var dirs = [];
         var seen = {};
@@ -1135,7 +1193,7 @@ function renderPlg() {
             return ia - ib;
         });
 
-        var h = '';
+        var h = renderBgPlg();
         // 通用模块：js/ 根目录脚本
         var tops = items.filter(function(it) { return !it.dir; });
         if (tops.length) {

@@ -614,15 +614,21 @@ function fetchCloudData(isSilent) {
 
 function doSeqUp(tAct) {
     var c = 0;
-    var fld = curType === 'img' ? 'img' : (curType === 'js' ? ('js' + (curUpDir ? '/' + curUpDir : '')) : 'mp3');
+    // 固定本次上传的上下文，避免异步过程中 curType / curUpDir 被改写
+    var upType = curType;
+    var upNames = upQueue.map(function(q){ return q.name + q.ext; });
+    var fld = upType === 'img' ? 'img' : (upType === 'js' ? ('js' + (curUpDir ? '/' + curUpDir : '')) : 'mp3');
     function upN() {
         if(c >= upQueue.length) {
-            if (curType === 'js') {
+            if (upType === 'js') {
                 msg('已上传，正在刷新插件列表...', true);
-                loadData();
-                renderPlg();
+                var done = loadData();
+                if (done && done.then) done.then(function(){ renderPlg(); }).catch(function(){ renderPlg(); });
+                else renderPlg();
                 return;
             }
+            // 关键修复：勾选“发布到网站”时，上传完成后立即按首/尾位置发布
+            if (tAct) { publishUploaded(upType, upNames, upPos); return; }
             msg('资源已成功上传');
             loadData();
             return;
@@ -639,6 +645,43 @@ function doSeqUp(tAct) {
     upN();
 }
 
+
+// 上传完成后按 upPos 直接把本次上传的文件发布到网站首/尾部。
+// 规则与“选中文件 → 发布”完全一致：图片始终让 迟来的深情.jpg 保持首位。
+function publishUploaded(type, names, pos) {
+    var arr = type === 'img' ? activeImgs : activeAudio;
+    var toAdd = [];
+    for (var i = 0; i < names.length; i++) {
+        if (arr.indexOf(names[i]) === -1 && toAdd.indexOf(names[i]) === -1) toAdd.push(names[i]);
+    }
+    if (toAdd.length === 0) { msg('已上传（文件原本就在网站中）'); loadData(); return; }
+
+    if (pos === 'end') {
+        for (var j = 0; j < toAdd.length; j++) arr.push(toAdd[j]);
+    } else if (type === 'img') {
+        for (var k = toAdd.length - 1; k >= 0; k--) {
+            var item = toAdd[k];
+            if (item === '迟来的深情.jpg') { arr.unshift(item); }
+            else {
+                var sfx = arr.indexOf('迟来的深情.jpg');
+                if (sfx !== -1) arr.splice(sfx + 1, 0, item); else arr.unshift(item);
+            }
+        }
+    } else {
+        for (var m = toAdd.length - 1; m >= 0; m--) arr.unshift(toAdd[m]);
+    }
+
+    var posTxt = (pos === 'start' ? '首部' : '尾部');
+    msg('正在发布到' + posTxt + '...', true);
+    saveIdx(true).then(function () {
+        renderMedia();
+        loadData();
+        msg('已上传并发布到' + posTxt);
+    }).catch(function () {
+        msg('发布失败，可在图库中手动发布');
+        loadData();
+    });
+}
 
 function commitDelRaw(p, s, n) {
     msg('删除中...', true);
@@ -916,7 +959,7 @@ function renderMedia() {
         var n = activeImgs[i];
         var f = findFile(allImgs, n);
         if(f) {
-            hI += '<div class="img-item '+(selItems.indexOf(f.name)!==-1?'sel':'')+'" id="i-'+f.sha+'" data-name="'+f.name+'" ontouchstart="ts(event, \''+f.name+'\', \''+f.path+'\', \''+f.sha+'\', \'img\', true)" ontouchmove="tm(event)" ontouchend="te(event)" onclick="iClk(\''+f.name+'\', this)">'+
+            hI += '<div class="img-item '+(selItems.indexOf(f.name)!==-1?'sel':'')+'" id="i-'+f.sha+'" data-name="'+f.name+'" ontouchstart="ts(event, \''+f.name+'\', \''+f.path+'\', \''+f.sha+'\', \'img\', true)" onpointerdown="ts(event, \''+f.name+'\', \''+f.path+'\', \''+f.sha+'\', \'img\', true)" ontouchmove="tm(event)" ontouchend="te(event)" onpointermove="tm(event)" onpointerup="te(event)" onpointercancel="te(event)" onclick="iClk(\''+f.name+'\', this)">'+
                   '<img src="'+f.download_url+'" loading="lazy"><div class="img-mask">'+f.name+'</div></div>';
         }
     }
@@ -926,7 +969,7 @@ function renderMedia() {
         var af = findFile(allAudio, aName);
         if(af) {
             var isP = (playPath === af.download_url && !audioObj.paused);
-            hA += '<div class="audio-item '+(isP?'playing':'')+' '+(selItems.indexOf(af.name)!==-1?'sel':'')+'" id="i-'+af.sha+'" data-name="'+af.name+'" ontouchstart="ts(event, \''+af.name+'\', \''+af.path+'\', \''+af.sha+'\', \'audio\', true)" ontouchmove="tm(event)" ontouchend="te(event)" onclick="aClk(\''+af.name+'\', \''+af.download_url+'\', this)">'+
+            hA += '<div class="audio-item '+(isP?'playing':'')+' '+(selItems.indexOf(af.name)!==-1?'sel':'')+'" id="i-'+af.sha+'" data-name="'+af.name+'" ontouchstart="ts(event, \''+af.name+'\', \''+af.path+'\', \''+af.sha+'\', \'audio\', true)" onpointerdown="ts(event, \''+af.name+'\', \''+af.path+'\', \''+af.sha+'\', \'audio\', true)" ontouchmove="tm(event)" ontouchend="te(event)" onpointermove="tm(event)" onpointerup="te(event)" onpointercancel="te(event)" onclick="aClk(\''+af.name+'\', \''+af.download_url+'\', this)">'+
                   '<div class="audio-info">'+af.name+'</div><svg class="play-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></div>';
         }
     }
@@ -934,7 +977,7 @@ function renderMedia() {
     for(var k=0; k<allImgs.length; k++) {
         var imgF = allImgs[k];
         if(imgF.type === 'file' && activeImgs.indexOf(imgF.name) === -1) {
-            hDI += '<div class="img-item '+(selItems.indexOf(imgF.name)!==-1?'sel':'')+'" id="i-'+imgF.sha+'" data-name="'+imgF.name+'" ontouchstart="ts(event, \''+imgF.name+'\', \''+imgF.path+'\', \''+imgF.sha+'\', \'img\', false)" ontouchmove="tm(event)" ontouchend="te(event)" onclick="iClk(\''+imgF.name+'\', this)">'+
+            hDI += '<div class="img-item '+(selItems.indexOf(imgF.name)!==-1?'sel':'')+'" id="i-'+imgF.sha+'" data-name="'+imgF.name+'" ontouchstart="ts(event, \''+imgF.name+'\', \''+imgF.path+'\', \''+imgF.sha+'\', \'img\', false)" onpointerdown="ts(event, \''+imgF.name+'\', \''+imgF.path+'\', \''+imgF.sha+'\', \'img\', false)" ontouchmove="tm(event)" ontouchend="te(event)" onpointermove="tm(event)" onpointerup="te(event)" onpointercancel="te(event)" onclick="iClk(\''+imgF.name+'\', this)">'+
                    '<img src="'+imgF.download_url+'" loading="lazy"><div class="img-mask">'+imgF.name+'</div></div>';
         }
     }
@@ -942,7 +985,7 @@ function renderMedia() {
     for(var l=0; l<allAudio.length; l++) {
         var audF = allAudio[l];
         if(audF.type === 'file' && activeAudio.indexOf(audF.name) === -1) {
-            hDA += '<div class="audio-item '+(selItems.indexOf(audF.name)!==-1?'sel':'')+'" id="i-'+audF.sha+'" data-name="'+audF.name+'" ontouchstart="ts(event, \''+audF.name+'\', \''+audF.path+'\', \''+audF.sha+'\', \'audio\', false)" ontouchmove="tm(event)" ontouchend="te(event)" onclick="aClk(\''+audF.name+'\', \''+audF.download_url+'\', this)">'+
+            hDA += '<div class="audio-item '+(selItems.indexOf(audF.name)!==-1?'sel':'')+'" id="i-'+audF.sha+'" data-name="'+audF.name+'" ontouchstart="ts(event, \''+audF.name+'\', \''+audF.path+'\', \''+audF.sha+'\', \'audio\', false)" onpointerdown="ts(event, \''+audF.name+'\', \''+audF.path+'\', \''+audF.sha+'\', \'audio\', false)" ontouchmove="tm(event)" ontouchend="te(event)" onpointermove="tm(event)" onpointerup="te(event)" onpointercancel="te(event)" onclick="aClk(\''+audF.name+'\', \''+audF.download_url+'\', this)">'+
                    '<div class="audio-info">'+audF.name+'</div></div>';
         }
     }
@@ -1352,20 +1395,34 @@ function initDrag(el, type, touch) {
     if(window.navigator && window.navigator.vibrate) window.navigator.vibrate(30);
 }
 
+// 统一取点：Pointer 事件没有 touches[]，Touch 事件没有 clientX/clientY
+function evPt(e) {
+    return (e.touches && e.touches.length) ? e.touches[0] : e;
+}
+
+// 触屏上 Pointer 与 Touch 会同时触发：pointer 只处理鼠标（桌面拖拽排序），
+// 触摸一律交给原生 touch 事件，保证移动端滚动/长按行为和原来完全一致。
+function ptrIsTouch(e) {
+    return !!(e.type && e.type.indexOf('pointer') === 0 && e.pointerType === 'touch');
+}
+
 function ts(e, n, p, s, t, isActive) {
+    if (ptrIsTouch(e)) return;                              // 触屏交给原生 touch 事件
+    if (e.button !== undefined && e.button !== 0) return;   // 只响应左键
     isLongPress = false;
     window.touchScrolling = false;
     setCur(t, n, p, s);
     curIsActive = isActive;
-    startX = e.touches[0].clientX;
-    startY = e.touches[0].clientY;
+    var p0 = evPt(e);
+    startX = p0.clientX;
+    startY = p0.clientY;
     
     if(multiMode) return; 
     
     if(sortMode && t === curSortTab) {
         e.stopPropagation();
         e.preventDefault(); 
-        initDrag(e.currentTarget, t, e.touches[0]);
+        initDrag(e.currentTarget, t, evPt(e));
         return;
     }
     
@@ -1380,7 +1437,8 @@ function ts(e, n, p, s, t, isActive) {
 }
 
 function tm(e) {
-    var touch = e.touches[0];
+    if (ptrIsTouch(e)) return;
+    var touch = evPt(e);
     if(Math.abs(touch.clientX - startX) > 10 || Math.abs(touch.clientY - startY) > 10) {
         window.touchScrolling = true;
         if(!isDragging) {
@@ -1420,6 +1478,7 @@ function tm(e) {
 }
 
 function te(e) {
+    if (ptrIsTouch(e)) return;
     clearTimeout(longT);
     if(pressingEl) pressingEl.classList.remove('pressing');
     if(multiMode) return;

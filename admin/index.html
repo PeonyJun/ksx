@@ -1247,34 +1247,59 @@ var BG_PLUGINS = [
         name: '玻璃雨珠',
         desc: 'WebGL 雨滴 · 背景层',
         script: 'js/玻璃雨珠/玻璃雨珠.js',
-        block: [
+        weathers: [{ id: 'rain', name: '大雨' }, { id: 'drizzle', name: '小雨' }],
+        weather: 'rain',
+        block: function (w) { return [
             '<div id="glass-rain" aria-hidden="true">',
             '    <canvas id="container"></canvas>',
             '    <div class="gr-deps">',
-            '        <div class="slide slide--current" id="slide-1" data-weather="rain"></div>',
+            '        <div class="slide slide--current" id="slide-1" data-weather="' + w + '"></div>',
             '        <a href="#slide-1"></a>',
             '    </div>',
             '</div>',
-            '<scr' + 'ipt src="js/玻璃雨珠/玻璃雨珠.js" data-weather="rain" defer></scr' + 'ipt>'
-        ].join('\n')
+            '<scr' + 'ipt src="js/玻璃雨珠/玻璃雨珠.js" data-weather="' + w + '" defer></scr' + 'ipt>'
+        ].join('\n'); }
     }
 ];
+var BG_WX = {};                                  // 记住每种背景插件当前选的天气
+function bgWeather(p) {
+    // 在 index.html 里找到引入本插件的 <script>，读同一标签上的 data-weather
+    var i = idxHtml.indexOf(p.script);
+    if (i < 0) return p.weather || 'rain';           // 没引入 → 用默认
+    var m = idxHtml.slice(i, i + 260).match(/data-weather\s*=\s*['"]([^'"]+)/i);
+    if (!m) return p.weather || 'rain';
+    return (m[1].indexOf('drizzle') >= 0 || m[1].indexOf('小') >= 0) ? 'drizzle' : 'rain';
+}
+function bgWxCur(p) {
+    if (!BG_WX[p.id]) BG_WX[p.id] = bgWeather(p);
+    return BG_WX[p.id];
+}
 function bgIsOn(p) {
     var re = new RegExp('<scr' + 'ipt[^>]*src\\s*=\\s*[\'"](?:\\.\\/)?' + escapeReg(p.script) + '[\'"]', 'i');
     return re.test(idxHtml) || idxHtml.indexOf('id="glass-rain"') !== -1;
 }
-function bgRewrite(html, p, on) {
+function bgRewrite(html, p, on, wx) {
+    var w = wx || bgWxCur(p);
     var scriptRe = new RegExp('<scr' + 'ipt[^>]*src\\s*=\\s*[\'"](?:\\.\\/)?' + escapeReg(p.script) + '[\'"][^>]*><\\/scr' + 'ipt>\\s*', 'ig');
     var divRe = /<div id="glass-rain"[\s\S]*?<\/div>\s*<\/div>\s*/g;
     var noteRe = /<!--\s*背景特效：玻璃雨珠[\s\S]*?-->\s*/g;
     html = html.replace(scriptRe, '').replace(divRe, '').replace(noteRe, '');
-    if (on) html = html.replace(/<\/body>/i, '<!-- 背景特效：玻璃雨珠（WebGL 雨滴，源码见 js/玻璃雨珠/）-->\n' + p.block + '\n</body>');
+    if (on) html = html.replace(/<\/body>/i, '<!-- 背景特效：玻璃雨珠（WebGL 雨滴，源码见 js/玻璃雨珠/）-->\n' + p.block(w) + '\n</body>');
     return html;
 }
 function renderBgPlg() {
     var h = '<div class="plg-group"><span>背景插件</span></div>';
     BG_PLUGINS.forEach(function(p) {
         var on = bgIsOn(p);
+        var cur = bgWxCur(p), wxHtml = '';
+        if (p.weathers) {
+            p.weathers.forEach(function (w) {
+                var c = (w.id === cur);
+                wxHtml += '<button type="button" onclick="togBgWeather(\'' + p.id + '\',\'' + w.id + '\')" style="margin-left:8px;padding:2px 10px;border-radius:999px;font:inherit;font-size:12px;cursor:pointer;border:1px solid '
+                    + (c ? 'rgba(226,199,132,.7)' : 'rgba(255,255,255,.18)') + ';background:'
+                    + (c ? 'rgba(226,199,132,.22)' : 'transparent') + ';color:' + (c ? '#efe0b8' : '#999') + '">' + w.name + '</button>';
+            });
+        }
         h += '<div class="plg-item"><div class="plg-name">' + p.name + ' <span class="plg-tag">' + p.desc + '</span></div>' +
             '<label class="switch"><input type="checkbox" ' + (on ? 'checked' : '') +
             ' onclick="event.preventDefault(); safeAction(\'背景插件\',\'确认' + (on ? '关闭' : '开启') + '「' + p.name + '」吗？\', function(){togBgPlg(\'' + p.id + '\')})">' +
@@ -1287,13 +1312,26 @@ function togBgPlg(id) {
     for (var i = 0; i < BG_PLUGINS.length; i++) { if (BG_PLUGINS[i].id === id) { p = BG_PLUGINS[i]; break; } }
     if (!p) return;
     var on = !bgIsOn(p);
-    var nH = bgRewrite(idxHtml, p, on);
+    var nH = bgRewrite(idxHtml, p, on, bgWxCur(p));
     msg('处理中...', true);
     api('/contents/index.html', 'PUT', { message: (on ? 'Enable' : 'Disable') + ' BG plugin ' + p.name, content: bE(nH), sha: idxSha }).then(function(r) {
         idxSha = r.content.sha; idxHtml = nH; renderPlg(); msg(on ? '背景插件已开启' : '背景插件已关闭');
     }).catch(function() { msg('操作失败'); });
 }
 
+function togBgWeather(id, w) {
+    var p = null;
+    for (var i = 0; i < BG_PLUGINS.length; i++) { if (BG_PLUGINS[i].id === id) { p = BG_PLUGINS[i]; break; } }
+    if (!p) return;
+    if (bgWxCur(p) === w) return;
+    if (!bgIsOn(p)) { BG_WX[p.id] = w; renderPlg(); return; }   // 关着就先记住，开启时用
+    var nH = bgRewrite(idxHtml, p, true, w);
+    msg('处理中...', true);
+    api('/contents/index.html', 'PUT', { message: 'Set BG plugin weather ' + w, content: bE(nH), sha: idxSha }).then(function(r) {
+        idxSha = r.content.sha; idxHtml = nH; BG_WX[p.id] = w; renderPlg();
+        msg(w === 'drizzle' ? '已切换为小雨' : '已切换为大雨');
+    }).catch(function() { msg('操作失败'); });
+}
 function renderPlg() {
     fxListAll().then(function(items) {
         // 背景插件由「背景插件」分区单独管理，从普通特效列表剔除，避免重复/歧义

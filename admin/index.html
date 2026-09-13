@@ -17,8 +17,8 @@ body > canvas:not(#cvs) { z-index: 9999 !important; pointer-events: none !import
 .login-box { width: 100%; max-width: 320px; text-align: center; background: var(--card); padding: 30px 20px; border-radius: 20px; border: 1px solid #1a1a1a; }
 .login-box svg { width: 50px; height: 50px; color: var(--accent); margin-bottom: 20px; }
 
-header { padding: 45px 20px 15px; display: flex; justify-content: space-between; align-items: flex-end; background: #000; border-bottom: 1px solid #1a1a1a; }
-header h1 { font-size: 20px; margin: 0; font-weight: 500; }
+header { padding: 45px 20px 15px; display: flex; justify-content: space-between; align-items: center; background: #000; border-bottom: 1px solid #1a1a1a; }
+header h1 { font-size: 20px; margin: 0; font-weight: 500; line-height: 1.1; }
 .content { flex: 1; overflow-y: auto; padding: 15px 15px 100px; position: relative; }
 
 .panel { display: none; }
@@ -247,12 +247,11 @@ nav { position: fixed; bottom: 0; left: 0; right: 0; height: 65px; background: #
         <button class="btn-save-inline" onclick="saveField('layout')">保存</button>
     </div>
     
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:30px; padding:15px; background:var(--card); border-radius:10px;">
-        <div>
-            <div style="font-size:14px; margin-bottom:4px;">前端缓存</div>
-            <div style="font-size:11px; color:var(--dim);">启用网站缓存.js</div>
-        </div>
-        <label class="switch"><input type="checkbox" id="switch-cache" onchange="toggleCache(this)"><span class="slider"></span></label>
+    <div style="font-size:12px; color:var(--dim); margin:15px 0 5px;">资源代理前缀（留空 = 直连 GitHub 官方）</div>
+    <input type="text" id="site-proxy" placeholder="例如 https://gh-proxy.org/" style="margin-top:0;" oninput="checkChange('site-proxy', 'act-proxy')">
+    <div class="action-bar" id="act-proxy">
+        <button class="btn-cancel-inline" onclick="cancelChange('site-proxy', 'act-proxy')">取消</button>
+        <button class="btn-save-inline" onclick="saveField('proxy')">保存</button>
     </div>
     
     <div style="display:flex; justify-content:space-between; align-items:center; margin-top:15px; padding:15px; background:var(--card); border-radius:10px;">
@@ -445,22 +444,6 @@ function execConfirm() {
     if(globalConfirmAction) { globalConfirmAction(); globalConfirmAction = null; }
 }
 
-function bumpCacheVer() {
-    var encPath = encodeURIComponent('缓存.js');
-    api('/contents/' + encPath).then(function(r){
-        var c = bD(r.content);
-        var updated = false;
-        c = c.replace(/((?:CACHE_NAME|cacheName|VERSION|version)\s*=\s*['"][^'"]*?(?:v|V)?)(\d+)(['"])/g, function(m, p1, p2, p3) {
-            updated = true; return p1 + (parseInt(p2) + 1) + p3;
-        });
-        if(!updated) {
-            c = c.replace(/(['"][^'"]*?(?:v|V))(\d+)(['"])/, function(m, p1, p2, p3) {
-                updated = true; return p1 + (parseInt(p2) + 1) + p3;
-            });
-        }
-        if(updated) api('/contents/' + encPath, 'PUT', { message: 'Bump cache version', content: bE(c), sha: r.sha });
-    }).catch(function(){});
-}
 
 function api(p, m, b) {
     var o = { method: m || 'GET', headers: { 'Authorization': 'token ' + tk, 'Accept': 'application/vnd.github.v3+json' } };
@@ -640,7 +623,6 @@ function doSeqUp(tAct) {
                 renderPlg();
                 return;
             }
-            bumpCacheVer();
             msg('资源已成功上传');
             loadData();
             return;
@@ -663,7 +645,6 @@ function commitDelRaw(p, s, n) {
     var encPath = p.split('/').map(encodeURIComponent).join('/');
     
     api('/contents/' + encPath, 'DELETE', {message:'Del '+n, sha:s}).then(function(){
-        bumpCacheVer();
         msg('已彻底删除');
         loadData();
     }).catch(function(){ 
@@ -679,7 +660,6 @@ function doMultiDelete() {
     var c = 0;
     function delNext() {
         if(c >= selItems.length) {
-            bumpCacheVer();
             msg('批量删除成功');
             cancelMulti();
             loadData();
@@ -868,6 +848,16 @@ function saveField(type) {
                .replace(/--col-pc-default:\s*\d+;/, '--col-pc-default: ' + pd + ';')
                .replace(/--col-pc-toggle:\s*\d+;/, '--col-pc-toggle: ' + pt + ';');
         msgTxt = '布局参数';
+    } else if (type === 'proxy') {
+        var px = document.getElementById('site-proxy').value.trim();
+        if (px && px.slice(-1) !== '/') px += '/';
+        var OFF = 'https://raw.githubusercontent.com/';
+        nH = nH.replace(/var\s+ASSET_BASE\s*=\s*'([^']*)'/, function(m, cur) {
+            var oi = cur.indexOf(OFF);
+            var official = oi === -1 ? cur : cur.slice(oi);
+            return "var ASSET_BASE = '" + px + official + "'";
+        });
+        msgTxt = '资源代理前缀';
     }
 
     msg('保存中...', true);
@@ -885,12 +875,14 @@ function saveField(type) {
             window.initVals['col-pd'] = document.getElementById('col-pd').value;
             window.initVals['col-pt'] = document.getElementById('col-pt').value;
         }
+        if (type === 'proxy') window.initVals['site-proxy'] = document.getElementById('site-proxy').value;
 
         if (type === 'name') document.getElementById('act-name').style.display = 'none';
         if (type === 'intro') document.getElementById('act-intro').style.display = 'none';
         if (type === 'ui-title') document.getElementById('act-ui-title').style.display = 'none';
         if (type === 'ui-sub') document.getElementById('act-ui-sub').style.display = 'none';
         if (type === 'layout') document.getElementById('act-layout').style.display = 'none';
+        if (type === 'proxy') document.getElementById('act-proxy').style.display = 'none';
 
         msg(msgTxt + '已保存');
     });
@@ -980,6 +972,13 @@ function extractAndRender() {
     var vMt = mtM ? mtM[1] : '';
     var vPd = pdM ? pdM[1] : '';
     var vPt = ptM ? ptM[1] : '';
+    var abM = idxHtml.match(/var\s+ASSET_BASE\s*=\s*'([^']*)'/);
+    var vProxy = '';
+    if (abM) {
+        var OFFICIAL = 'https://raw.githubusercontent.com/';
+        var oi = abM[1].indexOf(OFFICIAL);
+        vProxy = oi > 0 ? abM[1].slice(0, oi) : '';
+    }
 
     document.getElementById('site-name').value = vName;
     document.getElementById('site-intro').value = vIntro;
@@ -989,12 +988,14 @@ function extractAndRender() {
     document.getElementById('col-mt').value = vMt;
     document.getElementById('col-pd').value = vPd;
     document.getElementById('col-pt').value = vPt;
+    document.getElementById('site-proxy').value = vProxy;
 
     window.initVals = {
         'site-name': vName,
         'site-intro': vIntro,
         'site-ui-title': vUiTitle,
         'site-ui-sub': vUiSub,
+        'site-proxy': vProxy,
         'col-md': vMd,
         'col-mt': vMt,
         'col-pd': vPd,
@@ -1004,12 +1005,6 @@ function extractAndRender() {
     var bars = document.querySelectorAll('.action-bar');
     for(var i=0; i<bars.length; i++) bars[i].style.display = 'none';
 
-    var swCache = document.getElementById('switch-cache');
-    if (swCache) {
-        var isCacheOn = idxHtml.indexOf('navigator.serviceWorker.register') !== -1;
-        swCache.checked = isCacheOn;
-    }
-    
     parseIdx();
     renderPlg();
     renderMedia();
@@ -1026,7 +1021,12 @@ var FX_GROUP_ORDER = ['图片', '文字', '点击', '全屏'];
 var FX_GROUP_TITLE = { '图片': '图片类特效', '文字': '文字类特效', '点击': '点击类特效', '全屏': '全屏类特效' };
 
 function fxPathKey(s) {
-    s = String(s || '').replace(/^['"]|['"]$/g, '').trim();
+    s = String(s || '').trim();
+    // 兼容三种写法：'./js/xxx.js'、'js/xxx.js'、ASSET_BASE + 'js/xxx.js'
+    var m = s.match(/['"]([^'"]*?\.js)['"]/);
+    if (m) s = m[1];
+    s = s.replace(/^['"]|['"]$/g, '').trim();
+    s = s.replace(/^ASSET_BASE\s*\+\s*/i, '').replace(/^['"]|['"]$/g, '').trim();
     return s.replace(/^\.\//, '').replace(/^js\//, '').replace(/^\//, '');
 }
 
@@ -1078,7 +1078,10 @@ function fxRewrite(html, rel, enable) {
         var has = keys.indexOf(key) !== -1;
         if (enable && !has) keys.push(key);
         if (!enable && has) keys = keys.filter(function(k) { return k !== key; });
-        var body = keys.map(function(k) { return "        './js/" + k + "'"; }).join(',\n');
+        var useBase = /var\s+ASSET_BASE\s*=/.test(html);
+        var body = keys.map(function(k) {
+            return useBase ? ("        ASSET_BASE + 'js/" + k + "'") : ("        './js/" + k + "'");
+        }).join(',\n');
         return p1 + '\n' + body + '\n    ' + p3;
     });
 }
@@ -1215,34 +1218,6 @@ function renderPlg() {
     }).catch(function() {});
 }
 
-function toggleCache(cb) {
-    var act = cb.checked;
-    cb.checked = !act; 
-    
-    safeAction('缓存控制', '确认更改前台文件运行策略？', function(){
-        var nH = idxHtml;
-        var swRegStr = "<scr"+"ipt>\n//离线缓存执行脚本 执行：缓存.js\nif ('serviceWorker' in navigator) {\n    window.addEventListener('load', () => {\n        navigator.serviceWorker.register('/缓存.js').catch(() => {});\n    });\n}\n</scr"+"ipt>";
-        var swUnregStr = "<scr"+"ipt>\n//注销缓存执行脚本\nif ('serviceWorker' in navigator) {\n    navigator.serviceWorker.getRegistrations().then(function(rs) {\n        for(var i=0; i<rs.length; i++) rs[i].unregister();\n    });\n}\n</scr"+"ipt>";
-
-        var regRe = new RegExp('<scr'+'ipt>(?:(?!<scr'+'ipt>)[\\s\\S])*?//离线缓存执行脚本(?:(?!<scr'+'ipt>)[\\s\\S])*?</scr'+'ipt>\\n?', 'g');
-        var unregRe = new RegExp('<scr'+'ipt>(?:(?!<scr'+'ipt>)[\\s\\S])*?//注销缓存执行脚本(?:(?!<scr'+'ipt>)[\\s\\S])*?</scr'+'ipt>\\n?', 'g');
-        var rawRe = new RegExp('<scr'+'ipt>(?:(?!<scr'+'ipt>)[\\s\\S])*?navigator\\.serviceWorker\\.register\\(\\s*[\'"]/缓存\\.js[\'"]\\s*\\)(?:(?!<scr'+'ipt>)[\\s\\S])*?</scr'+'ipt>\\n?', 'g');
-
-        nH = nH.replace(regRe, '').replace(unregRe, '').replace(rawRe, '');
-        var injectStr = (act ? swRegStr : swUnregStr) + "\n";
-        nH = nH.replace(/<\/body>/i, injectStr + '</body>');
-
-        msg('处理中...', true);
-        api('/contents/index.html', 'PUT', {message: 'Toggle Cache SW', content: bE(nH), sha: idxSha}).then(function(r){ 
-            idxSha = r.content.sha; 
-            idxHtml = nH; 
-            cb.checked = act; 
-            msg('状态已更改'); 
-        }).catch(function(){
-            msg('操作失败');
-        });
-    });
-}
 
 
 
@@ -1341,98 +1316,13 @@ function togPlg(rel, e) {
     api('/contents/index.html', 'PUT', { message: 'Toggle ' + rel, content: bE(nH), sha: idxSha }).then(function(r) {
         idxSha = r.content.sha;
         idxHtml = nH;
-        bumpCacheVer();
         msg('配置已保存');
         renderPlg();
     }).catch(function() {
         msg('操作失败');
     });
 }
-function saveField(type) {
-    var nH = idxHtml;
-    var msgTxt = '';
 
-    if (type === 'name') {
-        var nm = document.getElementById('site-name').value;
-        nH = nH.replace(/<title>([\s\S]*?)<\/title>/, '<title>'+nm+'</title>')
-               .replace(/<meta property="og:title" content="([\s\S]*?)">/, '<meta property="og:title" content="'+nm+'">')
-               .replace(/"headline":\s*"([^"]*)"/, '"headline": "'+nm+'"');
-        msgTxt = '网站名称';
-    } else if (type === 'intro') {
-        var i = document.getElementById('site-intro').value;
-        nH = nH.replace(/<meta name="description" content="([\s\S]*?)">/, '<meta name="description" content="'+i+'">')
-               .replace(/<meta property="og:description" content="([\s\S]*?)">/, '<meta property="og:description" content="'+i+'">')
-               .replace(/"description":\s*"([^"]*)"/, '"description": "'+i+'"');
-        msgTxt = '网站介绍';
-    } else if (type === 'ui-title') {
-        var uiT = document.getElementById('site-ui-title').value;
-        nH = nH.replace(/<div class="title">[\s\S]*?<\/div>/, '<div class="title">'+uiT+'</div>');
-        msgTxt = '小标题一';
-    } else if (type === 'ui-sub') {
-        var uiS = document.getElementById('site-ui-sub').value;
-        nH = nH.replace(/<div class="subtitle">[\s\S]*?<\/div>/, '<div class="subtitle">'+uiS+'</div>');
-        msgTxt = '小标题二';
-    } else if (type === 'layout') {
-        var md = document.getElementById('col-md').value || '4';
-        var mt = document.getElementById('col-mt').value || '5';
-        var pd = document.getElementById('col-pd').value || '11';
-        var pt = document.getElementById('col-pt').value || '13';
-        nH = nH.replace(/--col-mobile-default:\s*\d+;/, '--col-mobile-default: ' + md + ';')
-               .replace(/--col-mobile-toggle:\s*\d+;/, '--col-mobile-toggle: ' + mt + ';')
-               .replace(/--col-pc-default:\s*\d+;/, '--col-pc-default: ' + pd + ';')
-               .replace(/--col-pc-toggle:\s*\d+;/, '--col-pc-toggle: ' + pt + ';');
-        msgTxt = '布局参数';
-    }
-
-    msg('保存中...', true);
-    api('/contents/index.html', 'PUT', { message: 'Update ' + msgTxt, content: bE(nH), sha: idxSha }).then(function(r){
-        idxSha = r.content.sha;
-        idxHtml = nH;
-        
-        if (type === 'name') window.initVals['site-name'] = document.getElementById('site-name').value;
-        if (type === 'intro') window.initVals['site-intro'] = document.getElementById('site-intro').value;
-        if (type === 'ui-title') window.initVals['site-ui-title'] = document.getElementById('site-ui-title').value;
-        if (type === 'ui-sub') window.initVals['site-ui-sub'] = document.getElementById('site-ui-sub').value;
-        if (type === 'layout') {
-            window.initVals['col-md'] = document.getElementById('col-md').value;
-            window.initVals['col-mt'] = document.getElementById('col-mt').value;
-            window.initVals['col-pd'] = document.getElementById('col-pd').value;
-            window.initVals['col-pt'] = document.getElementById('col-pt').value;
-        }
-
-        if (type === 'name') document.getElementById('btn-save-name').style.display = 'none';
-        if (type === 'intro') document.getElementById('btn-save-intro').style.display = 'none';
-        if (type === 'ui-title') document.getElementById('btn-save-ui-title').style.display = 'none';
-        if (type === 'ui-sub') document.getElementById('btn-save-ui-sub').style.display = 'none';
-        if (type === 'layout') document.getElementById('btn-save-layout').style.display = 'none';
-
-        msg(msgTxt + '已保存');
-    });
-}
-
-function bumpCacheVersion() {
-    msg('正在刷新前台缓存...', true);
-    api('/contents/缓存.js?t=' + new Date().getTime()).then(function(r) {
-        var content = bD(r.content);
-        var sha = r.sha;
-        
-        var newContent = content.replace(/(CACHE_NAME\s*=\s*['"][^0-9]*)(\d+)([^0-9]*['"])/, function(match, p1, p2, p3) {
-            return p1 + (parseInt(p2) + 1) + p3;
-        });
-        
-        if (content !== newContent) {
-            api('/contents/缓存.js', 'PUT', { message: 'Bump cache version', content: bE(newContent), sha: sha }).then(function() {
-                msg('前台缓存已强制刷新');
-            }).catch(function() {
-                msg('缓存刷新失败');
-            });
-        } else {
-            msg('保存成功');
-        }
-    }).catch(function() {
-        msg('保存成功');
-    });
-}
 
 
 function setCur(t,n,p,s) { curType=t; curName=n; curPath=p; curSha=s; }
@@ -1777,7 +1667,6 @@ function saveIdx(skipM) {
     return api('/contents/index.html', 'PUT', {message:'Sync Media', content:bE(nH), sha:idxSha}).then(function(r){ 
         idxSha=r.content.sha; 
         idxHtml=nH; 
-        bumpCacheVer();
         if(!skipM){renderMedia();hideMsg();} 
     });
 }

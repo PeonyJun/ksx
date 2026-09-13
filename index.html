@@ -1337,7 +1337,8 @@ renderAllPerfectly();
         ASSET_BASE + 'js/分手时间.js',
         ASSET_BASE + 'js/全屏/樱花特效.js',
         ASSET_BASE + 'js/点击/水波纹点击特效.js',
-        ASSET_BASE + 'js/图片/图片呼吸特效.js'
+        ASSET_BASE + 'js/图片/图片呼吸特效.js',
+        ASSET_BASE + 'js/全屏/雨落特效.js'
     ];
     var loaded = false;
     function loadFx() {
@@ -1380,5 +1381,19 @@ renderAllPerfectly();
      同源加载：本地 file:// 与线上 Pages 均可稳定执行。
      不用 fetch（file:// 会被拦截），不用 gh-proxy（其 .js 返回 text/plain 无法执行）。-->
 <script src="js/玻璃雨珠/index.min.js" defer></script>
+<!-- 百度自动推送：每次访问自动向百度提交当前 URL -->
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var protocol = window.location.protocol.split(':')[0];
+    if (protocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+    } else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
 </body>
 </html>

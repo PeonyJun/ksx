@@ -1,0 +1,9 @@
+# https://www.zhksx.xyz/robots.txt
+User-agent: *
+Allow: /
+
+# 后台管理页不参与收录
+Disallow: /admin/
+
+# 站点地图（百度/谷歌可自动发现）
+Sitemap: https://www.zhksx.xyz/sitemap.xml

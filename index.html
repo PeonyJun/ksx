@@ -1420,5 +1420,14 @@ renderAllPerfectly();
     s.parentNode.insertBefore(bp, s);
 })();
 </script>
+<!-- 背景特效：玻璃雨珠（WebGL 雨滴，源码见 js/玻璃雨珠/）-->
+<div id="glass-rain" aria-hidden="true">
+    <canvas id="container"></canvas>
+    <div class="gr-deps">
+        <div class="slide slide--current" id="slide-1" data-weather="rain"></div>
+        <a href="#slide-1"></a>
+    </div>
+</div>
+<script src="js/玻璃雨珠/index.min.js" defer></script>
 </body>
 </html>

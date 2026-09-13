@@ -2,6 +2,8 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
+<!-- 背景特效：玻璃雨珠（WebGL 雨滴，源码见 js/玻璃雨珠/）—— 放 <head> 顶部，让特效最先开始加载 -->
+<script src="js/玻璃雨珠/玻璃雨珠.js" data-weather="rain" defer></script>
 <script>/* 资源基准（后台「设置 → 资源代理前缀」可改）
    留空        -> ./   跟着当前目录走（把整站下载到本地时用这个）
    填 github   -> GitHub 官方仓库直连（大小写皆可）
@@ -1403,7 +1405,7 @@ renderAllPerfectly();
     s.parentNode.insertBefore(bp, s);
 })();
 </script>
-<!-- 背景特效：玻璃雨珠（WebGL 雨滴，源码见 js/玻璃雨珠/）-->
+<!-- 背景容器（占位）：引入脚本已提到 <head> 顶部优先加载；万一 js 没加载出来，这层还兜底色 -->
 <div id="glass-rain" aria-hidden="true">
     <canvas id="container"></canvas>
     <div class="gr-deps">
@@ -1411,6 +1413,5 @@ renderAllPerfectly();
         <a href="#slide-1"></a>
     </div>
 </div>
-<script src="js/玻璃雨珠/玻璃雨珠.js" data-weather="rain" defer></script>
 </body>
 </html>

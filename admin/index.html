@@ -1256,8 +1256,7 @@ var BG_PLUGINS = [
             '        <div class="slide slide--current" id="slide-1" data-weather="' + w + '"></div>',
             '        <a href="#slide-1"></a>',
             '    </div>',
-            '</div>',
-            '<scr' + 'ipt src="js/玻璃雨珠/玻璃雨珠.js" data-weather="' + w + '" defer></scr' + 'ipt>'
+            '</div>'
         ].join('\n'); }
     }
 ];
@@ -1284,7 +1283,14 @@ function bgRewrite(html, p, on, wx) {
     var divRe = /<div id="glass-rain"[\s\S]*?<\/div>\s*<\/div>\s*/g;
     var noteRe = /<!--\s*背景特效：玻璃雨珠[\s\S]*?-->\s*/g;
     html = html.replace(scriptRe, '').replace(divRe, '').replace(noteRe, '');
-    if (on) html = html.replace(/<\/body>/i, '<!-- 背景特效：玻璃雨珠（WebGL 雨滴，源码见 js/玻璃雨珠/）-->\n' + p.block(w) + '\n</body>');
+    if (on) {
+        // 引入脚本紧跟 <meta charset> 插到 <head> 顶部：尽早开始下载，特效优先加载
+        var tag = '<!-- 背景特效：玻璃雨珠（WebGL 雨滴，源码见 js/玻璃雨珠/）-->' + '\n' +
+            '<scr' + 'ipt src="' + p.script + '" data-weather="' + w + '" defer></scr' + 'ipt>' + '\n';
+        html = html.replace(/(<meta charset=["']?UTF-8["']?>\s*)/i, function (m, g) { return g + tag; });
+        // 容器仍留在 body 末尾：js 没加载出来时还有底色兜底
+        html = html.replace(/<\/body>/i, p.block(w) + '\n</body>');
+    }
     return html;
 }
 function renderBgPlg() {

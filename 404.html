@@ -2,6 +2,8 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
+<!-- 背景：玻璃雨珠（大雨）—— 放 <head> 顶部优先加载；defer 保证 body 就绪后再执行 -->
+<script src="/js/玻璃雨珠/玻璃雨珠.js" data-weather="rain" defer></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="robots" content="noindex, follow">
 <meta name="theme-color" content="#050505">
@@ -116,7 +118,5 @@ body {
 })();
 </script>
 
-<!-- 背景：玻璃雨珠（大雨）。js 与 data-img/ 和本页同目录，故用相对路径 -->
-<script src="/js/玻璃雨珠/玻璃雨珠.js" data-weather="rain"></script>
 </body>
 </html>

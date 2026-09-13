@@ -17,7 +17,7 @@ body > canvas:not(#cvs) { z-index: 9999 !important; pointer-events: none !import
 .login-box { width: 100%; max-width: 320px; text-align: center; background: var(--card); padding: 30px 20px; border-radius: 20px; border: 1px solid #1a1a1a; }
 .login-box svg { width: 50px; height: 50px; color: var(--accent); margin-bottom: 20px; }
 
-header { padding: 45px 20px 15px; display: flex; justify-content: space-between; align-items: center; background: #000; border-bottom: 1px solid #1a1a1a; }
+header { padding: 14px 20px 14px; padding-top: calc(14px + env(safe-area-inset-top, 0px)); display: flex; justify-content: space-between; align-items: center; background: #000; border-bottom: 1px solid #1a1a1a; }
 header h1 { font-size: 20px; margin: 0; font-weight: 500; line-height: 1.1; }
 .content { flex: 1; overflow-y: auto; padding: 15px 15px 100px; position: relative; }
 
@@ -247,11 +247,18 @@ nav { position: fixed; bottom: 0; left: 0; right: 0; height: 65px; background: #
         <button class="btn-save-inline" onclick="saveField('layout')">保存</button>
     </div>
     
-    <div style="font-size:12px; color:var(--dim); margin:15px 0 5px;">资源代理前缀（留空 = 直连 GitHub 官方）</div>
-    <input type="text" id="site-proxy" placeholder="例如 https://gh-proxy.org/" style="margin-top:0;" oninput="checkChange('site-proxy', 'act-proxy')">
+    <div style="font-size:12px; color:var(--dim); margin:15px 0 5px;">前台资源代理（留空 = ./ 跟着目录走 ｜ 填 github = 官方仓库 ｜ 填其它 = 自定义代理）</div>
+    <input type="text" id="site-proxy" placeholder="留空 = ./ ｜ github ｜ https://gh-proxy.org/" style="margin-top:0;" oninput="checkChange('site-proxy', 'act-proxy')">
     <div class="action-bar" id="act-proxy">
         <button class="btn-cancel-inline" onclick="cancelChange('site-proxy', 'act-proxy')">取消</button>
         <button class="btn-save-inline" onclick="saveField('proxy')">保存</button>
+    </div>
+
+    <div style="font-size:12px; color:var(--dim); margin:15px 0 5px;">后台资源代理（只作用于本控制台 ｜ 留空 = 直连官方 ｜ 填 github = 官方 ｜ 填其它 = 自定义代理）</div>
+    <input type="text" id="admin-proxy" placeholder="留空 = 直连 ｜ github ｜ https://gh-proxy.org/" style="margin-top:0;" oninput="checkChange('admin-proxy', 'act-aproxy')">
+    <div class="action-bar" id="act-aproxy">
+        <button class="btn-cancel-inline" onclick="cancelChange('admin-proxy', 'act-aproxy')">取消</button>
+        <button class="btn-save-inline" onclick="saveField('aproxy')">保存</button>
     </div>
     
     <div style="display:flex; justify-content:space-between; align-items:center; margin-top:15px; padding:15px; background:var(--card); border-radius:10px;">
@@ -387,6 +394,38 @@ var remFlag = localStorage.getItem('ksx_rem') !== 'false';
 var tk = remFlag ? (localStorage.getItem('gt') || sessionStorage.getItem('gt')) : sessionStorage.getItem('gt');
 var repo = localStorage.getItem('gr') || '';
 
+/* ===== 后台专用资源代理（只作用于本控制台，和前台互不影响） =====
+   取值写在 admin/index.html 自身源码里，点「保存」时写回本文件；
+   留空 = 直连官方 ｜ 填 github = 官方直连（大小写皆可）｜ 其它 = 自定义代理前缀。 */
+var ADMIN_PROXY = '';
+(function () {
+    var sc = document.currentScript;
+    if (sc && sc.textContent) {
+        // 行首锚定：只认真正的声明，避免匹配到本文件里其它同名字符串
+        var m = sc.textContent.match(/^var\s+ADMIN_PROXY\s*=\s*'([^']*)';/m);
+        if (m) ADMIN_PROXY = m[1];
+    }
+})();
+/* 给官方地址套上后台代理（幂等：重复调用不会叠加前缀） */
+function apx(u) {
+    if (!u || !/^https?:/i.test(u)) return u;
+    var v = String(ADMIN_PROXY || '').trim();
+    if (!v) return u;                                          // 留空 = 直连官方
+    if (v.toLowerCase().indexOf('github') !== -1) return u;     // 填 github = 走官方
+    if (v.slice(-1) !== '/') v += '/';
+    if (u.indexOf(v) === 0) return u;                           // 已经是代理地址
+    return v + u;
+}
+/* 文件对象归一化：记住原始官方地址，按当前代理重算，改代理后立刻生效 */
+function pxFile(f) {
+    if (f && f.download_url) {
+        if (!f._src) f._src = f.download_url;
+        f.download_url = apx(f._src);
+    }
+    return f;
+}
+function pxList(a) { (a || []).forEach(pxFile); return a; }
+
 var idxSha = '', idxHtml = '';
 var activeImgs = [], activeAudio = [];
 var allImgs = [], allAudio = [];
@@ -519,7 +558,7 @@ function loadData() {
         try {
             var d = JSON.parse(localData);
             idxSha = d.idxSha; idxHtml = d.idxHtml;
-            allImgs = d.allImgs; allAudio = d.allAudio;
+            allImgs = pxList(d.allImgs); allAudio = pxList(d.allAudio);
             extractAndRender();
         } catch(e){}
     }
@@ -603,7 +642,7 @@ function fetchCloudData(isSilent) {
         idxSha = r.sha; idxHtml = newHtml;
         return Promise.all([api('/contents/img' + cb).catch(function(){return [];}), api('/contents/mp3' + cb).catch(function(){return [];})]);
     }).then(function(res) {
-        allImgs = res[0] || []; allAudio = res[1] || [];
+        allImgs = pxList(res[0] || []); allAudio = pxList(res[1] || []);
         var d = { idxSha: idxSha, idxHtml: idxHtml, allImgs: allImgs, allAudio: allAudio };
         localStorage.setItem('ksx_cached_data', JSON.stringify(d));
         extractAndRender();
@@ -857,7 +896,34 @@ function setUpPos(p) {
 
 
 
+/* 保存后台专用代理：写回 admin/index.html 自身（与前台完全独立） */
+function saveAdminProxy() {
+    var rawVal = document.getElementById('admin-proxy').value.trim();
+    var v = rawVal.replace(/'/g, "\\'");
+    msg('保存中...', true);
+    api('/contents/admin/index.html').then(function (r) {
+        var raw = bD(r.content);
+        if (!/var\s+ADMIN_PROXY\s*=\s*'([^']*)'/.test(raw)) throw new Error('NO_VAR');
+        var nRaw = raw.replace(/var\s+ADMIN_PROXY\s*=\s*'([^']*)'/, function () {
+            return "var ADMIN_PROXY = '" + v + "'";
+        });
+        return api('/contents/admin/index.html', 'PUT', {
+            message: 'Update admin proxy prefix',
+            content: bE(nRaw),
+            sha: r.sha
+        });
+    }).then(function () {
+        ADMIN_PROXY = rawVal;
+        window.initVals['admin-proxy'] = rawVal;
+        document.getElementById('act-aproxy').style.display = 'none';
+        localStorage.removeItem('ksx_cached_data');   // 清掉旧代理缓存，重新拉取
+        msg('后台代理已保存');
+        fetchCloudData(false);
+    }).catch(function () { msg('保存失败'); });
+}
+
 function saveField(type) {
+    if (type === 'aproxy') { saveAdminProxy(); return; }
     var nH = idxHtml;
     var msgTxt = '';
 
@@ -892,15 +958,12 @@ function saveField(type) {
                .replace(/--col-pc-toggle:\s*\d+;/, '--col-pc-toggle: ' + pt + ';');
         msgTxt = '布局参数';
     } else if (type === 'proxy') {
-        var px = document.getElementById('site-proxy').value.trim();
-        if (px && px.slice(-1) !== '/') px += '/';
-        var OFF = 'https://raw.githubusercontent.com/';
-        nH = nH.replace(/var\s+ASSET_BASE\s*=\s*'([^']*)'/, function(m, cur) {
-            var oi = cur.indexOf(OFF);
-            var official = oi === -1 ? cur : cur.slice(oi);
-            return "var ASSET_BASE = '" + px + official + "'";
+        var px = document.getElementById('site-proxy').value.trim().replace(/'/g, "\\'");
+        // 只写“原始配置”，./ 与 github 的解析在 index.html 内完成
+        nH = nH.replace(/var\s+ASSET_CFG\s*=\s*'([^']*)'/, function() {
+            return "var ASSET_CFG = '" + px + "'";
         });
-        msgTxt = '资源代理前缀';
+        msgTxt = '前台资源代理';
     }
 
     msg('保存中...', true);
@@ -1015,12 +1078,18 @@ function extractAndRender() {
     var vMt = mtM ? mtM[1] : '';
     var vPd = pdM ? pdM[1] : '';
     var vPt = ptM ? ptM[1] : '';
-    var abM = idxHtml.match(/var\s+ASSET_BASE\s*=\s*'([^']*)'/);
+    // 兼容新旧写法：优先读 ASSET_CFG（原始配置）；旧文件从 ASSET_BASE 反推代理前缀
     var vProxy = '';
-    if (abM) {
-        var OFFICIAL = 'https://raw.githubusercontent.com/';
-        var oi = abM[1].indexOf(OFFICIAL);
-        vProxy = oi > 0 ? abM[1].slice(0, oi) : '';
+    var cfgM = idxHtml.match(/var\s+ASSET_CFG\s*=\s*'([^']*)'/);
+    if (cfgM) {
+        vProxy = cfgM[1];
+    } else {
+        var abM = idxHtml.match(/var\s+ASSET_BASE\s*=\s*'([^']*)'/);
+        if (abM) {
+            var OFFICIAL = 'https://raw.githubusercontent.com/';
+            var oi = abM[1].indexOf(OFFICIAL);
+            vProxy = oi > 0 ? abM[1].slice(0, oi) : '';
+        }
     }
 
     document.getElementById('site-name').value = vName;
@@ -1032,6 +1101,7 @@ function extractAndRender() {
     document.getElementById('col-pd').value = vPd;
     document.getElementById('col-pt').value = vPt;
     document.getElementById('site-proxy').value = vProxy;
+    document.getElementById('admin-proxy').value = ADMIN_PROXY || '';
 
     window.initVals = {
         'site-name': vName,
@@ -1039,6 +1109,7 @@ function extractAndRender() {
         'site-ui-title': vUiTitle,
         'site-ui-sub': vUiSub,
         'site-proxy': vProxy,
+        'admin-proxy': ADMIN_PROXY || '',
         'col-md': vMd,
         'col-mt': vMt,
         'col-pd': vPd,
@@ -1136,13 +1207,13 @@ function fxListAll() {
         var dirs = [];
         (fs || []).forEach(function(f) {
             if (f.type === 'dir') dirs.push(f.name);
-            else if (/\.js$/i.test(f.name)) tops.push({ dir: '', name: f.name, path: f.name, url: f.download_url });
+            else if (/\.js$/i.test(f.name)) tops.push({ dir: '', name: f.name, path: f.name, url: apx(f.download_url) });
         });
         var ps = dirs.map(function(d) {
             return api('/contents/js/' + encodeURIComponent(d)).then(function(sub) {
                 var list = [];
                 (sub || []).forEach(function(f) {
-                    if (f.type === 'file' && /\.js$/i.test(f.name)) list.push({ dir: d, name: f.name, path: d + '/' + f.name, url: f.download_url });
+                    if (f.type === 'file' && /\.js$/i.test(f.name)) list.push({ dir: d, name: f.name, path: d + '/' + f.name, url: apx(f.download_url) });
                 });
                 return list;
             }).catch(function() { return []; });

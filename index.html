@@ -70,8 +70,8 @@ var ASSET_BASE = (function () {
     --accent-gold: #d4af37;
     --col-mobile-default: 4;
     --col-mobile-toggle: 5;
-    --col-pc-default: 7;
-    --col-pc-toggle: 9;
+    --col-pc-default: 11;
+    --col-pc-toggle: 13;
 }
 
 
@@ -1387,7 +1387,7 @@ renderAllPerfectly();
 </script>
 <!-- 玻璃雨珠（背景层）由后台「插件 → 背景插件」开关控制：
      开启时后台把下面的容器与脚本标签整段插入本页，关闭时整段移除。
-     源码在 js/玻璃雨珠/，其纹理按本页路径相对解析（js/玻璃雨珠/img/…），
+     源码在 js/玻璃雨珠/，其纹理按本页路径相对解析（js/玻璃雨珠/data-img/…），
      所以把整站下载到本地同样能正常显示。 -->
 <!-- 百度自动推送：每次访问自动向百度提交当前 URL -->
 <script>
@@ -1411,6 +1411,6 @@ renderAllPerfectly();
         <a href="#slide-1"></a>
     </div>
 </div>
-<script src="js/玻璃雨珠/index.min.js" defer></script>
+<script src="js/玻璃雨珠/玻璃雨珠.js" data-weather="rain" defer></script>
 </body>
 </html>

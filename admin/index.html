@@ -397,7 +397,7 @@ var repo = localStorage.getItem('gr') || '';
 /* ===== 后台专用资源代理（只作用于本控制台，和前台互不影响） =====
    取值写在 admin/index.html 自身源码里，点「保存」时写回本文件；
    留空 = 直连官方 ｜ 填 github = 官方直连（大小写皆可）｜ 其它 = 自定义代理前缀。 */
-var ADMIN_PROXY = 'https://gh-proxy.org/';
+var ADMIN_PROXY = '';
 (function () {
     var sc = document.currentScript;
     if (sc && sc.textContent) {
@@ -1246,7 +1246,7 @@ var BG_PLUGINS = [
         id: 'glass-rain',
         name: '玻璃雨珠',
         desc: 'WebGL 雨滴 · 背景层',
-        script: 'js/玻璃雨珠/index.min.js',
+        script: 'js/玻璃雨珠/玻璃雨珠.js',
         block: [
             '<div id="glass-rain" aria-hidden="true">',
             '    <canvas id="container"></canvas>',
@@ -1255,7 +1255,7 @@ var BG_PLUGINS = [
             '        <a href="#slide-1"></a>',
             '    </div>',
             '</div>',
-            '<scr' + 'ipt src="js/玻璃雨珠/index.min.js" defer></scr' + 'ipt>'
+            '<scr' + 'ipt src="js/玻璃雨珠/玻璃雨珠.js" data-weather="rain" defer></scr' + 'ipt>'
         ].join('\n')
     }
 ];

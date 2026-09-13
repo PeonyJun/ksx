@@ -120,8 +120,8 @@ body {
         gap: 16px; padding: 0 40px 120px;
     }
     #c.dense { grid-template-columns: repeat(var(--col-pc-toggle), 1fr); }
-    .img-wrap { contain-intrinsic-size: auto 205px; }
-    #c.dense .img-wrap { contain-intrinsic-size: auto 170px; }
+    .img-wrap { contain-intrinsic-size: auto var(--thumb-h, 205px); }
+    #c.dense .img-wrap { contain-intrinsic-size: auto var(--thumb-h-dense, 170px); }
 }
 
 .img-wrap {
@@ -137,11 +137,12 @@ body {
     justify-content: center;
     contain: content;
     content-visibility: auto;
-    contain-intrinsic-size: auto 110px;
+    /* 高度由 JS 实测同步（--thumb-h），避免估算与实际不符造成页面高度抖动 */
+    contain-intrinsic-size: auto var(--thumb-h, 110px);
 }
 /* dense(5列)下卡片更小，尺寸估计贴近实际，避免滚动时布局反复修正 */
 #c.dense .img-wrap {
-    contain-intrinsic-size: auto 90px;
+    contain-intrinsic-size: auto var(--thumb-h-dense, 90px);
 }
 /* 仅在交互(悬停放大)时提升合成层，避免全列表常驻 80+ 合成层 */
 .img-wrap.loaded:hover {
@@ -605,9 +606,12 @@ body.intro-lock { overflow: hidden; }
 
 </head>
 <body>
-<!-- 背景特效：玻璃雨珠（WebGL 雨滴，源码见 js/玻璃雨珠/）-->
+<!-- 背景特效：玻璃雨珠（WebGL 雨滴，源码见 js/玻璃雨珠/）
+     默认关闭：容器 display:none 且不自动加载脚本。
+     在后台「插件」面板启用「玻璃雨珠」后，loadFx 会为其加上 .gr-on 显示容器。 -->
 <style>
-#glass-rain{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden;background:#05070d}
+#glass-rain{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden;background:#05070d;display:none}
+#glass-rain.gr-on{display:block}
 #glass-rain .gr-deps{display:none}
 #glass-rain #container{position:absolute;top:0;left:0;display:block}
 </style>
@@ -671,7 +675,6 @@ body.intro-lock { overflow: hidden; }
 <script>
 !function(){
     const musicFiles = [
-        '你很甜mp3',
         '尾季篇.mp3',
         '失去后才明白.mp3',
         '落日.mp3',
@@ -1199,6 +1202,32 @@ const showImage = (index, dir) => {
 };
 renderAllPerfectly();
 
+// 布局稳定化：content-visibility 对离屏项使用估算高度，若估算与实测不符，
+// 首屏渲染/滚动时整页高度会变化，看起来就是"内容整体往下跳动一下"。
+// 这里实测缩略图真实高度并写入 CSS 变量，让估算值与实际完全一致。
+(function syncThumbMetrics() {
+    var grid = document.getElementById('c');
+    if (!grid) return;
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var root = document.documentElement;
+    function setVar(name, px) {
+        if (px > 0 && root.style.getPropertyValue(name) !== px + 'px') {
+            root.style.setProperty(name, px + 'px');
+        }
+    }
+    function measure() {
+        var probe = grid.querySelector('.img-wrap');
+        if (probe) setVar('--thumb-h', probe.offsetHeight);
+        var dp = document.querySelector('#c.dense .img-wrap');
+        if (dp) setVar('--thumb-h-dense', dp.offsetHeight);
+    }
+    measure();
+    raf(measure);
+    setTimeout(measure, 400);
+    window.addEventListener('resize', function () { raf(measure); }, { passive: true });
+    window.addEventListener('orientationchange', function () { setTimeout(measure, 200); }, { passive: true });
+})();
+
     q.onclick=pp;
     b.onclick=()=>{ld(c-1)};
     n.onclick=()=>{ld(c+1)};
@@ -1338,12 +1367,19 @@ renderAllPerfectly();
         ASSET_BASE + 'js/分手时间.js',
         ASSET_BASE + 'js/全屏/樱花特效.js',
         ASSET_BASE + 'js/点击/水波纹点击特效.js',
-        ASSET_BASE + 'js/图片/图片呼吸特效.js'
+        ASSET_BASE + 'js/图片/图片呼吸特效.js',
+        ASSET_BASE + 'js/全屏/雨落特效.js'
     ];
     var loaded = false;
     function loadFx() {
         if (loaded) return;
         loaded = true;
+        // 雨滴（玻璃雨珠）默认关闭：仅当它在 fxFiles 中被启用时，才显示它的容器
+        (function () {
+            var on = fxFiles.some(function (u) { return String(u).indexOf('玻璃雨珠') !== -1; });
+            var gr = document.getElementById('glass-rain');
+            if (gr) gr.classList.toggle('gr-on', on);
+        })();
         // gh-proxy 对 .js 返回 text/plain + nosniff，直接 <script src> 会被浏览器拒绝执行；
         // 故改为 fetch 文本 -> Blob(application/javascript) -> 按原顺序依次执行，效果与原来一致。
         var i = 0;
@@ -1377,10 +1413,11 @@ renderAllPerfectly();
     }
 })();
 </script>
-<!-- 背景特效：玻璃雨珠（WebGL 雨滴），源码位于 js/玻璃雨珠/。
-     同源加载：本地 file:// 与线上 Pages 均可稳定执行。
-     不用 fetch（file:// 会被拦截），不用 gh-proxy（其 .js 返回 text/plain 无法执行）。-->
-<script src="js/玻璃雨珠/index.min.js" defer></script>
+<!-- 玻璃雨珠源码位于 js/玻璃雨珠/。
+     同源加载：本地 file:// 与线上 Pages 均可稳定执行。 -->
+<!-- 雨滴（玻璃雨珠）默认关闭：不再自动加载，改由后台「插件」面板按需开启。
+     开启后 loadFx 会把容器 #glass-rain 加上 .gr-on 显示出来。
+     手动开启方式：往上方 fxFiles 数组加入 ASSET_BASE + 'js/玻璃雨珠/index.min.js'。 -->
 <!-- 百度自动推送：每次访问自动向百度提交当前 URL -->
 <script>
 (function(){

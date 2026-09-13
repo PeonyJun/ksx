@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>玻璃雨珠 · 独立版用法示例</title>
+<style>
+    * { box-sizing: border-box; }
+    body {
+        margin: 0; min-height: 100vh;
+        font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+        color: #fff; background: #05070d;
+        display: flex; align-items: center; justify-content: center;
+        padding: 40px 20px;
+    }
+    .card {
+        position: relative; z-index: 1;
+        max-width: 640px; width: 100%;
+        background: rgba(10, 14, 22, 0.55);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 14px; padding: 28px 26px;
+        backdrop-filter: blur(6px);
+    }
+    h1 { font-size: 22px; margin: 0 0 6px; font-weight: 600; letter-spacing: .04em; }
+    .sub { color: rgba(255,255,255,.55); font-size: 13px; margin: 0 0 22px; }
+    p { line-height: 1.7; font-size: 14px; color: rgba(255,255,255,.82); }
+    code, pre {
+        font-family: ui-monospace, Menlo, Consolas, monospace;
+        font-size: 12.5px;
+    }
+    pre {
+        background: rgba(0,0,0,.42); border: 1px solid rgba(255,255,255,.1);
+        border-radius: 8px; padding: 12px 14px; overflow-x: auto;
+        color: #9fe0c0; line-height: 1.6;
+    }
+    .tip { font-size: 12.5px; color: rgba(255,255,255,.5); }
+</style>
+</head>
+<body>
+    <div class="card">
+        <h1>玻璃雨珠 · 独立版</h1>
+        <p class="sub">这个页面的背景只靠一行 script 标签就有了</p>
+
+        <p>引入方式（放在页面 body 结束标签之前）：</p>
+        <pre>&lt;script src="/js/glass-rain.js"&gt;&lt;/script&gt;</pre>
+
+        <p>想改雨势或资源目录，就在它<b>之前</b>加一段配置：</p>
+        <pre>&lt;script&gt;
+  window.GLASS_RAIN = {
+    weather: 'rain',    // rain / drizzle / sunny / storm / fallout
+    zIndex: -1,         // 看不到就改成 0 或 1
+    opacity: 1
+  };
+&lt;/script&gt;</pre>
+        <p class="tip">背景是固定层，不会挡住点击；上面的卡片就是普通页面内容。</p>
+    </div>
+
+    <!-- 玻璃雨珠背景特效 · 独立版 -->
+    <script src="/js/glass-rain.js"></script>
+</body>
+</html>

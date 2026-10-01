@@ -655,7 +655,7 @@ function doSeqUp(tAct) {
     var c = 0;
     // 固定本次上传的上下文，避免异步过程中 curType / curUpDir 被改写
     var upType = curType;
-    var upNames = upQueue.map(function(q){ return q.name + q.ext; });
+    var upNames = upQueue.map(function(q){ return q.name + '.' + q.ext; });
     var fld = upType === 'img' ? 'img' : (upType === 'js' ? ('js' + (curUpDir ? '/' + curUpDir : '')) : 'mp3');
     function upN() {
         if(c >= upQueue.length) {
@@ -673,7 +673,7 @@ function doSeqUp(tAct) {
             return;
         }
         msg('上传执行 ' + (c + 1) + '/' + upQueue.length + '...', true);
-        var fn = upQueue[c].name + upQueue[c].ext;
+        var fn = upQueue[c].name + '.' + upQueue[c].ext;
         var encFld = fld.split('/').map(encodeURIComponent).join('/');
         api('/contents/' + encFld + '/' + encodeURIComponent(fn), 'PUT', { message: 'Up ' + fn, content: upQueue[c].b64 }).then(function() {
             c++; upN();

@@ -2,13 +2,9 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<!-- 背景特效：玻璃雨珠（WebGL 雨滴，源码见 js/玻璃雨珠/）—— 放 <head> 顶部，让特效最先开始加载 -->
 <script src="js/玻璃雨珠/玻璃雨珠.js" data-weather="rain" defer></script>
-<script>/* 资源基准（后台「设置 → 资源代理前缀」可改）
-   留空        -> ./   跟着当前目录走（把整站下载到本地时用这个）
-   填 github   -> GitHub 官方仓库直连（大小写皆可）
-   填其它前缀  -> 自定义代理，例如 https://gh-proxy.org/ */
-var ASSET_CFG = 'https://gh-proxy.org/';   /* 当前线上值；改成空串即变 ./ 本地模式 */
+<script>
+var ASSET_CFG = '';   
 var ASSET_OFFICIAL = 'https://raw.githubusercontent.com/PeonyJun/ksx/main/';
 var ASSET_BASE = (function () {
     var v = String(ASSET_CFG || '').trim();
@@ -18,7 +14,7 @@ var ASSET_BASE = (function () {
     return v + ASSET_OFFICIAL;
 })();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<script>/* 站点图标跟随资源基准，本地打开时不再请求外链 */
+<script>
 (function () {
     ['shortcut icon', 'icon'].forEach(function (rel) {
         var l = document.createElement('link');
@@ -467,148 +463,6 @@ body > canvas:not(#cvs) {
     z-index: 10000 !important;
 }
 
-/* ===== 开场：星夜回忆（intro） ===== */
-#intro {
-    position: fixed;
-    inset: 0;
-    z-index: 9000;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 1;
-    transition: opacity .6s ease;
-    font-family: 'Noto Serif SC', 'Kaiti SC', 'STKaiti', 'KaiTi', serif;
-    -webkit-tap-highlight-color: transparent;
-    cursor: pointer;
-}
-#intro.out { opacity: 0; pointer-events: none; }
-body.intro-lock { overflow: hidden; }
-.intro-bg {
-    position: absolute;
-    inset: 0;
-    background:
-        radial-gradient(110% 72% at 50% 118%, rgba(105, 126, 204, 0.20), rgba(105, 126, 204, 0) 60%),
-        radial-gradient(95% 55% at 50% -8%, rgba(158, 178, 255, 0.12), rgba(158, 178, 255, 0) 60%),
-        linear-gradient(180deg, rgba(4,6,13,0.62) 0%, rgba(10,15,32,0.5) 58%, rgba(12,17,38,0.55) 100%);
-}
-.intro-bg::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(46% 30% at 50% 46%, rgba(212, 175, 55, 0.055), transparent 70%);
-}
-/* 星空层（canvas 绘制带光晕的星点） */
-.intro-sky {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 1;
-    pointer-events: none;
-}
-.intro-shoot {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 150px;
-    height: 2px;
-    z-index: 2;
-    border-radius: 2px;
-    background: linear-gradient(90deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.35) 55%, rgba(255, 255, 255, 0));
-    box-shadow: 0 0 12px rgba(190, 214, 255, 0.9);
-    opacity: 0;
-    transform: translate(56vw, -8vh) rotate(-33deg);
-    animation: introShoot 1.7s ease-out .4s 1 forwards;
-}
-@keyframes introShoot {
-    0%   { opacity: 0; transform: translate(70vw, -12vh) rotate(-33deg) scaleX(.15); }
-    10%  { opacity: 1; }
-    100% { opacity: 0; transform: translate(-12vw, 44vh) rotate(-33deg) scaleX(1); }
-}
-/* 文案 */
-.intro-copy {
-    position: relative;
-    z-index: 4;
-    text-align: center;
-    max-width: 92vw;
-    padding: 0 22px;
-}
-.i-eyebrow {
-    margin: 0 0 30px;
-    font-size: 13px;
-    letter-spacing: 0.62em;
-    text-indent: 0.62em;
-    color: rgba(224, 205, 152, 0.92);
-    text-shadow: 0 0 18px rgba(224, 205, 152, 0.55);
-    opacity: 0;
-    animation: iUp .9s ease .75s forwards;
-}
-.i-title { margin: 0 0 26px; }
-.i-line {
-    margin: 0;
-    font-size: clamp(27px, 7vw, 50px);
-    line-height: 1.6;
-    letter-spacing: 0.13em;
-    text-indent: 0.13em;
-    color: #f7efdb;
-    text-shadow:
-        0 0 30px rgba(255, 228, 180, 0.35),
-        0 0 90px rgba(150, 180, 255, 0.28);
-    opacity: 0;
-}
-.i-title .i-line:nth-child(1) { animation: iUp 1s cubic-bezier(.2, .8, .2, 1) 1.4s forwards; }
-.i-title .i-line:nth-child(2) { animation: iUp 1s cubic-bezier(.2, .8, .2, 1) 2.15s forwards; }
-.i-sub {
-    margin: 0 0 46px;
-    font-size: 14px;
-    letter-spacing: 0.3em;
-    text-indent: 0.3em;
-    color: rgba(198, 210, 240, 0.72);
-    text-shadow: 0 0 16px rgba(140, 165, 235, 0.35);
-    opacity: 0;
-    animation: iUp 1s ease 3.1s forwards;
-}
-.intro-cta {
-    display: inline-block;
-    padding: 14px 52px 14px 58px;
-    border-radius: 999px;
-    border: 1px solid rgba(226, 199, 132, 0.65);
-    background: rgba(226, 199, 132, 0.08);
-    color: #efe0b8;
-    font-family: inherit;
-    font-size: 16px;
-    letter-spacing: 0.42em;
-    text-indent: 0.42em;
-    text-shadow: 0 0 14px rgba(255, 228, 170, 0.5);
-    opacity: 0;
-    cursor: pointer;
-    transition: background .3s ease, color .3s ease, box-shadow .3s ease;
-    animation:
-        iUp .9s ease 3.9s forwards,
-        ctaGlow 2.8s ease-in-out 5s infinite;
-}
-.intro-cta::before {
-    content: '✦ ';
-    color: rgba(255, 224, 150, 0.95);
-    margin-right: 6px;
-}
-@keyframes iUp {
-    from { opacity: 0; transform: translateY(18px); }
-    to   { opacity: 1; transform: translateY(0); }
-}
-@keyframes ctaGlow {
-    0%, 100% { box-shadow: 0 0 18px rgba(226, 199, 132, 0.18), 0 0 0 0 rgba(226, 199, 132, 0); }
-    50%      { box-shadow: 0 0 34px rgba(226, 199, 132, 0.5), 0 0 60px rgba(150, 180, 255, 0.16); }
-}
-.intro-cta:hover {
-    background: rgba(226, 199, 132, 0.22);
-    color: #fff6e2;
-}
-@media (max-width: 479px) {
-    .i-eyebrow { margin-bottom: 22px; }
-    .intro-cta { padding: 13px 38px 13px 44px; font-size: 15px; }
-}
 
 </style>
 
@@ -616,26 +470,10 @@ body.intro-lock { overflow: hidden; }
 </head>
 <body>
 <style>
-/* 背景层：容器由后台「插件 → 背景插件」控制，存在即显示 */
 #glass-rain{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden;background:#05070d}
 #glass-rain .gr-deps{display:none}
 #glass-rain #container{position:absolute;top:0;left:0;display:block}
 </style>
-<!-- ===== 开场：星夜回忆 ===== -->
-<div id="intro" class="intro">
-  <div class="intro-bg"></div>
-  <canvas class="intro-sky" id="introSky" aria-hidden="true"></canvas>
-  <div class="intro-shoot" aria-hidden="true"></div>
-  <div class="intro-copy">
-    <p class="i-eyebrow">阚双雪致 · 我们曾看过的光</p>
-    <div class="i-title">
-      <p class="i-line">看过的风景</p>
-      <p class="i-line">我都守着</p>
-    </div>
-    <p class="i-sub">轻轻一点 · 回到那些日子</p>
-    <button class="intro-cta" type="button">进入回忆</button>
-  </div>
-</div>
 <div class="noise"></div>
 <div class="header">
     <div class="title">KSX ZH</div>
@@ -672,7 +510,7 @@ body.intro-lock { overflow: hidden; }
 <script>
 !function(){
     const musicFiles = [
-        '你很甜mp3',
+        '你很甜.mp3',
         '尾季篇.mp3',
         '失去后才明白.mp3',
         '落日.mp3',
@@ -1023,8 +861,6 @@ body.intro-lock { overflow: hidden; }
     }
     vImg.decoding = 'async';
 
-    // ---- 原图预取：缩略图加载完后，空闲时逐张预取对应的原图（低优先级），
-    // 结果进浏览器 HTTP 缓存，之后点开大图即秒开，不再等待网络 ----
     const origQueue = [];
     const origDone = new Set();
     let origRunning = false;
@@ -1203,10 +1039,6 @@ renderAllPerfectly();
     q.onclick=pp;
     b.onclick=()=>{ld(c-1)};
     n.onclick=()=>{ld(c+1)};
-
-    // 修复：在首次用户手势的捕获阶段即建立 Web Audio 通路（createMediaElementSource），
-    // 保证之后任何 u.play() 都发生在通路就绪之后，避免"播放中接管 audio 元素"
-    // 造成歌曲开头重复/叠音（线上网络延迟时尤其明显）。
     function warmAudio() {
         if(!inited && t.length) initAudio();
         if(ac && ac.state === 'suspended') ac.resume();
@@ -1221,116 +1053,6 @@ renderAllPerfectly();
     });
 }();
 </script>
-<script>
-// ===== 开场：星夜回忆 =====
-(function () {
-    var intro = document.getElementById('intro');
-    if (!intro) return;
-
-    var INTRO_KEY = 'ksx_intro_seen_at';
-    var INTRO_TTL = 15 * 24 * 60 * 60 * 1000; // 15 天(毫秒)
-    var lastSeen = 0;
-    try { lastSeen = parseInt(localStorage.getItem(INTRO_KEY) || '0', 10) || 0; } catch (e) {}
-    if (lastSeen && (Date.now() - lastSeen) < INTRO_TTL) {
-        intro.remove();
-        document.body.classList.remove('intro-lock');
-        return;
-    }
-    try { localStorage.setItem(INTRO_KEY, String(Date.now())); } catch (e) {}
-
-    if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
-    window.scrollTo(0, 0);
-    window.addEventListener('pageshow', function () { window.scrollTo(0, 0); }, { passive: true });
-
-    var t0 = Date.now();
-    document.body.classList.add('intro-lock');
-
-    // 星空：canvas 绘制圆形柔光星点，缓慢呼吸（非方块）
-    var sky = document.getElementById('introSky');
-    var ctx = sky ? sky.getContext('2d') : null;
-    var stars = [];
-    var raf = 0;
-    var W = 0, H = 0;
-
-    function buildSky() {
-        if (!ctx) return;
-        var dpr = Math.min(window.devicePixelRatio || 1, 2);
-        W = window.innerWidth;
-        H = window.innerHeight;
-        sky.width = Math.round(W * dpr);
-        sky.height = Math.round(H * dpr);
-        sky.style.width = W + 'px';
-        sky.style.height = H + 'px';
-        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        var count = Math.min(150, Math.max(60, Math.round(W * H / 16000)));
-        stars = [];
-        for (var i = 0; i < count; i++) {
-            var big = Math.random() < 0.13;
-            var warm = Math.random() < 0.16;
-            stars.push({
-                x: Math.random() * W,
-                y: Math.random() * H * 0.9,
-                r: big ? (1.3 + Math.random() * 1.5) : (0.35 + Math.random() * 0.95),
-                warm: warm,
-                sp: 0.4 + Math.random() * 1.1,
-                ph: Math.random() * Math.PI * 2
-            });
-        }
-    }
-
-    function drawSky(ts) {
-        if (!ctx) return;
-        ctx.clearRect(0, 0, W, H);
-        var t = ts || 0;
-        for (var i = 0; i < stars.length; i++) {
-            var s = stars[i];
-            var b = 0.6 + 0.4 * Math.sin(t * 0.001 * s.sp * 6.283 + s.ph);
-            var r = s.r * 6.5;
-            var g = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, r);
-            if (s.warm) {
-                g.addColorStop(0, 'rgba(255,242,218,' + (0.85 * b).toFixed(3) + ')');
-                g.addColorStop(0.28, 'rgba(255,218,160,' + (0.26 * b).toFixed(3) + ')');
-            } else {
-                g.addColorStop(0, 'rgba(255,255,255,' + (0.92 * b).toFixed(3) + ')');
-                g.addColorStop(0.28, 'rgba(208,225,255,' + (0.3 * b).toFixed(3) + ')');
-            }
-            g.addColorStop(1, 'rgba(190,210,255,0)');
-            ctx.fillStyle = g;
-            ctx.beginPath();
-            ctx.arc(s.x, s.y, r, 0, 6.283);
-            ctx.fill();
-        }
-        raf = requestAnimationFrame(drawSky);
-    }
-
-    function startSky() {
-        if (!ctx) return;
-        buildSky();
-        raf = requestAnimationFrame(drawSky);
-    }
-    window.addEventListener('resize', function () { if (ctx) buildSky(); });
-    startSky();
-
-    function close() {
-        if (!intro.isConnected) return;
-        cancelAnimationFrame(raf);
-        intro.classList.add('out');
-        document.body.classList.remove('intro-lock');
-        window.scrollTo(0, 0);
-        setTimeout(function () { intro.remove(); }, 680);
-    }
-    document.addEventListener('click', function (e) {
-        if (!intro.isConnected) return;
-        if (!e.target.closest('#intro')) return;
-        if (Date.now() - t0 < 4600) return;
-        e.stopImmediatePropagation();
-        e.preventDefault();
-        close();
-    }, true);
-})();
-</script>
-
-
 <script>
 (function () {
     var fxFiles = [
@@ -1387,25 +1109,6 @@ renderAllPerfectly();
     }
 })();
 </script>
-<!-- 玻璃雨珠（背景层）由后台「插件 → 背景插件」开关控制：
-     开启时后台把下面的容器与脚本标签整段插入本页，关闭时整段移除。
-     源码在 js/玻璃雨珠/，其纹理按本页路径相对解析（js/玻璃雨珠/data-img/…），
-     所以把整站下载到本地同样能正常显示。 -->
-<!-- 百度自动推送：每次访问自动向百度提交当前 URL -->
-<script>
-(function(){
-    var bp = document.createElement('script');
-    var protocol = window.location.protocol.split(':')[0];
-    if (protocol === 'https') {
-        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
-    } else {
-        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
-    }
-    var s = document.getElementsByTagName('script')[0];
-    s.parentNode.insertBefore(bp, s);
-})();
-</script>
-<!-- 背景容器（占位）：引入脚本已提到 <head> 顶部优先加载；万一 js 没加载出来，这层还兜底色 -->
 <div id="glass-rain" aria-hidden="true">
     <canvas id="container"></canvas>
     <div class="gr-deps">

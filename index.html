@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <script src="js/玻璃雨珠/玻璃雨珠.js" data-weather="rain" defer></script>
 <script>
-var ASSET_CFG = '';   
+var ASSET_CFG = 'https://gh-proxy.org/';   
 var ASSET_OFFICIAL = 'https://raw.githubusercontent.com/PeonyJun/ksx/main/';
 var ASSET_BASE = (function () {
     var v = String(ASSET_CFG || '').trim();
@@ -242,22 +242,19 @@ img:not([src]), img[src=""], img:-moz-broken {
 .nav-container {
     position: fixed; bottom: 0; left: 0; width: 100%; height: 100px;
     display: flex; justify-content: center; align-items: flex-end;
-    z-index: 1000; background: linear-gradient(to top, rgba(5,5,5,0.72) 10%, transparent);
+    z-index: 1000; background: linear-gradient(to top, rgba(5,5,5,0.35) 10%, transparent);
     pointer-events: none; padding-bottom: 15px;
 }
 .nav {
     pointer-events: auto; width: 100%; max-width: 380px; height: 50px;
-    /* 玻璃拟态：半透明 + 背景模糊，透出身后的雨珠/画面 */
-    background: rgba(28, 28, 32, 0.42);
-    -webkit-backdrop-filter: blur(20px) saturate(150%);
-    backdrop-filter: blur(20px) saturate(150%);
+    background: transparent;
     border: 1px solid rgba(255,255,255,0.14); border-radius: 25px;
     display: flex; align-items: center; justify-content: space-evenly;
     box-shadow: 0 10px 40px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.14);
     position: relative; overflow: hidden;
     transition: transform 0.3s ease, background 0.3s;
 }
-.nav:hover { background: rgba(38, 38, 44, 0.55); transform: translateY(-2px); }
+.nav:hover { background: rgba(255, 255, 255, 0.06); transform: translateY(-2px); }
 #cvs {
     position: absolute; bottom: 0; left: 0; width: 100%; height: 100%;
     opacity: 0.6; pointer-events: none; mix-blend-mode: screen;

@@ -96,6 +96,7 @@ body {
     <button id="go" type="button">回到主页</button>
     <p class="hint">若没有自动跳转，点上面的按钮</p>
 </main>
+<audio id="bgm" src="/mp3/你很甜.mp3" loop preload="auto"></audio>
 
 <script>
 (function () {
@@ -109,6 +110,15 @@ body {
         if (nEl) nEl.textContent = String(Math.max(left, 0));
         if (left <= 0) { clearInterval(timer); location.replace(HOME); }
     }, 1000);
+
+    var bgm = document.getElementById('bgm');
+    function startBgm() {
+        if (!bgm) return;
+        var p = bgm.play();
+        if (p !== undefined) p.catch(function () {});
+    }
+    document.addEventListener('pointerdown', startBgm, { capture: true, once: true });
+    document.addEventListener('click', startBgm, { capture: true, once: true });
 
     var go = document.getElementById('go');
     if (go) {

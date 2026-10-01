@@ -18,7 +18,7 @@
         base:       '',          // 纹理目录；留空 = 用同级的 data-img/
         zIndex:     -1,          // 层级：-1 垫在内容之后；html+body 都有底色时自动让位
         opacity:    1,           // 整体透明度，0~1
-        background: '#05070d',   // 雨景底色，纹理没就绪时也不白屏
+        background: '#141a26',   // 雨景底色，纹理没就绪时也不白屏
         dprCap:     1.5,         // 清晰度上限，越大越清晰越费电
         cache:      true,        // 纹理缓存：首次下载后存本地，下次直接读；false 关闭
         enabled:    true         // false = 临时关掉
@@ -253,6 +253,7 @@
         'z-index:' + CFG.zIndex + ';' +
         'pointer-events:none;overflow:hidden;' +
         'background:' + CFG.background + ';' +
+        'filter:brightness(1.4) saturate(1.15);' +
         'opacity:' + CFG.opacity + ';}' +
         '#' + ROOT_ID + ' .gr-deps{display:none}' +
         '#' + ROOT_ID + ' canvas{position:absolute;left:0;top:0;display:block}';
